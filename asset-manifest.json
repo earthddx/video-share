@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.js": "/MusicShare/static/js/main.c4f31563.js",
+    "main.js": "/MusicShare/static/js/main.80f548a5.js",
     "reactPlayerYouTube.js": "/MusicShare/static/js/reactPlayerYouTube.0a8f9765.chunk.js",
     "reactPlayerSoundCloud.js": "/MusicShare/static/js/reactPlayerSoundCloud.2930c3a7.chunk.js",
     "reactPlayerVimeo.js": "/MusicShare/static/js/reactPlayerVimeo.7ac8d951.chunk.js",
@@ -16,7 +16,7 @@
     "reactPlayerFilePlayer.js": "/MusicShare/static/js/reactPlayerFilePlayer.99fb136c.chunk.js",
     "reactPlayerPreview.js": "/MusicShare/static/js/reactPlayerPreview.24202b0b.chunk.js",
     "index.html": "/MusicShare/index.html",
-    "main.c4f31563.js.map": "/MusicShare/static/js/main.c4f31563.js.map",
+    "main.80f548a5.js.map": "/MusicShare/static/js/main.80f548a5.js.map",
     "reactPlayerYouTube.0a8f9765.chunk.js.map": "/MusicShare/static/js/reactPlayerYouTube.0a8f9765.chunk.js.map",
     "reactPlayerSoundCloud.2930c3a7.chunk.js.map": "/MusicShare/static/js/reactPlayerSoundCloud.2930c3a7.chunk.js.map",
     "reactPlayerVimeo.7ac8d951.chunk.js.map": "/MusicShare/static/js/reactPlayerVimeo.7ac8d951.chunk.js.map",
@@ -33,6 +33,6 @@
     "reactPlayerPreview.24202b0b.chunk.js.map": "/MusicShare/static/js/reactPlayerPreview.24202b0b.chunk.js.map"
   },
   "entrypoints": [
-    "static/js/main.c4f31563.js"
+    "static/js/main.80f548a5.js"
   ]
 }
