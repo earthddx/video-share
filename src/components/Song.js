@@ -6,73 +6,17 @@ import {
   CardActions,
   Typography,
   IconButton,
-<<<<<<< HEAD
   Tooltip,
 } from "@mui/material";
 import { PlayArrow, Queue, Cancel, Pause, Check } from "@mui/icons-material";
 import { useMutation } from "@apollo/client";
-=======
-  makeStyles,
-  Tooltip,
-} from "@material-ui/core";
-import { PlayArrow, Queue, Cancel, Pause, Check } from "@material-ui/icons";
-import { useMutation } from "@apollo/react-hooks";
->>>>>>> b3eb029f673d880add61f8329d07f6756d857994
 import UseAnimations from "react-useanimations";
 import activity from "react-useanimations/lib/activity";
 
 import { ADD_OR_REMOVE_SONG_FROM_QUEUE } from "../graphql/mutations";
 import { SongContext } from "../App";
 
-<<<<<<< HEAD
 export default function Song({ song, handleDeleteSong, queue }) {
-=======
-const useStyles = makeStyles((theme) => ({
-  container: {
-    margin: theme.spacing(1),
-    position: "relative",
-  },
-  songInfoContainer: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-  },
-  songInfo: {
-    width: "100%",
-    display: "flex",
-    justifyContent: "space-between",
-  },
-  deleteSong: {
-    position: "absolute",
-    right: 2,
-    top: 2,
-    opacity: 0,
-    transitionDuration: ".5s",
-    "&:hover": {
-      opacity: 1,
-      borderRadius: 30,
-      backgroundColor: "rgba(0,0,0,.75)",
-    },
-  },
-  typography: {
-    fontFamily: theme.typography.fontFamily,
-    fontWeight: theme.typography.fontWeightMedium,
-    width: 230,
-    textOverflow: "ellipsis",
-    overflow: "hidden",
-    whiteSpace: "nowrap",
-  },
-
-  thumbnail: {
-    objectFit: "cover",
-    width: "100%",
-    height: 180,
-  },
-}));
-
-export default function Song({ song, handleDeleteSong, queue }) {
-  const classes = useStyles();
->>>>>>> b3eb029f673d880add61f8329d07f6756d857994
   const { artist, title, thumbnail } = song;
   const { state, dispatch } = useContext(SongContext);
   const [currSongPlaying, setCurrSongPlaying] = useState(false);
@@ -102,34 +46,22 @@ export default function Song({ song, handleDeleteSong, queue }) {
   };
 
   return (
-<<<<<<< HEAD
     <Card sx={{ margin: 1, position: "relative" }}>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
         <div
-          sx={{
+          style={{
             position: "absolute",
             right: 2,
             top: 2,
             opacity: 0,
             transitionDuration: ".5s",
-            "&:hover": {
-              opacity: 1,
-              borderRadius: 30,
-              backgroundColor: "rgba(0,0,0,.75)",
-            },
           }}
+          onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
+          onMouseLeave={(e) => (e.currentTarget.style.opacity = 0)}
         >
           <Tooltip title="Delete song">
             <IconButton onClick={() => handleDeleteSong(song.id)}>
               <Cancel sx={{ fontSize: 30 }} color="primary" />
-=======
-    <Card className={classes.container}>
-      <div className={classes.songInfoContainer}>
-        <div className={classes.deleteSong}>
-          <Tooltip title="Delete song">
-            <IconButton onClick={() => handleDeleteSong(song.id)}>
-              <Cancel style={{ fontSize: 30 }} color="primary" />
->>>>>>> b3eb029f673d880add61f8329d07f6756d857994
             </IconButton>
           </Tooltip>
         </div>
@@ -153,7 +85,6 @@ export default function Song({ song, handleDeleteSong, queue }) {
                 variant="h5"
                 color="primary"
               >
-<<<<<<< HEAD
                 <UseAnimations animation={activity} size={136} strokeColor="white" />
               </Typography>
             </div>
@@ -173,20 +104,6 @@ export default function Song({ song, handleDeleteSong, queue }) {
               whiteSpace: "nowrap",
             }}
           >
-=======
-                <UseAnimations
-                  animation={activity}
-                  size={136}
-                  strokeColor="white"
-                />
-              </Typography>
-            </div>
-          ) : null}
-          <CardMedia image={thumbnail} className={classes.thumbnail} />
-        </div>
-        <div className={classes.songInfo}>
-          <CardContent className={classes.typography}>
->>>>>>> b3eb029f673d880add61f8329d07f6756d857994
             <Tooltip title={title}>
               <Typography gutterBottom variant="body1" component="h6">
                 {title}
@@ -209,15 +126,7 @@ export default function Song({ song, handleDeleteSong, queue }) {
                     <Check />
                   </IconButton>
                 ) : (
-<<<<<<< HEAD
                   <IconButton size="small" color="secondary" onClick={handleAddToQueue}>
-=======
-                  <IconButton
-                    size="small"
-                    color="secondary"
-                    onClick={handleAddToQueue}
-                  >
->>>>>>> b3eb029f673d880add61f8329d07f6756d857994
                     <Queue />
                   </IconButton>
                 )}

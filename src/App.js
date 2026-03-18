@@ -1,11 +1,6 @@
 import React, { createContext, useContext, useReducer } from "react";
-<<<<<<< HEAD
 import { Grid, useMediaQuery } from "@mui/material";
 import { useQuery } from "@apollo/client";
-=======
-import { Grid, useMediaQuery } from "@material-ui/core";
-import { useQuery } from "@apollo/react-hooks";
->>>>>>> b3eb029f673d880add61f8329d07f6756d857994
 
 import Header from "./components/Header";
 import SongList from "./components/SongList";
@@ -45,11 +40,7 @@ function App() {
               flexDirection: "column",
             }}
           >
-<<<<<<< HEAD
             <QueudSongList queue={data?.queue ?? []} />
-=======
-            <QueudSongList queue={data.queue} />
->>>>>>> b3eb029f673d880add61f8329d07f6756d857994
           </Grid>
         )}
         <Grid
@@ -59,16 +50,9 @@ function App() {
           md={6}
           style={{
             paddingTop: 100,
-<<<<<<< HEAD
           }}
         >
           <SongList queue={data?.queue ?? []} />
-=======
-
-          }}
-        >
-          <SongList queue={data.queue} />
->>>>>>> b3eb029f673d880add61f8329d07f6756d857994
         </Grid>
         <Grid item md={3} />
       </Grid>

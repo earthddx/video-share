@@ -1,15 +1,5 @@
 import React, { useContext, useState, useRef, useEffect } from "react";
-<<<<<<< HEAD
 import { Typography, IconButton, Slider, Tooltip } from "@mui/material";
-=======
-import {
-  Typography,
-  IconButton,
-  Slider,
-  Tooltip,
-  makeStyles,
-} from "@material-ui/core";
->>>>>>> b3eb029f673d880add61f8329d07f6756d857994
 import {
   SkipPrevious,
   SkipNext,
@@ -17,26 +7,13 @@ import {
   Pause,
   VideoLabel,
   RepeatOne,
-<<<<<<< HEAD
 } from "@mui/icons-material";
 import ReactPlayer from "react-player";
 import { useQuery } from "@apollo/client";
-=======
-} from "@material-ui/icons";
-import ReactPlayer from "react-player";
-import { useQuery } from "@apollo/react-hooks";
->>>>>>> b3eb029f673d880add61f8329d07f6756d857994
 
 import { SongContext } from "../App";
 import { GET_QUEUED_SONGS } from "../graphql/queries";
 
-<<<<<<< HEAD
-=======
-const useStyles = makeStyles((theme) => ({
-  songPlayer: {},
-}));
-
->>>>>>> b3eb029f673d880add61f8329d07f6756d857994
 export default function SongPlayer() {
   const { data } = useQuery(GET_QUEUED_SONGS);
   const { state, dispatch } = useContext(SongContext);
@@ -48,10 +25,6 @@ export default function SongPlayer() {
   const [positionInQueue, setPositionInQueue] = useState(0);
   const [toggleVideo, setToggleVideo] = useState(true);
   const reactPlayerRef = useRef();
-<<<<<<< HEAD
-=======
-  const classes = useStyles();
->>>>>>> b3eb029f673d880add61f8329d07f6756d857994
 
   useEffect(() => {
     const songIndex = data.queue.findIndex((song) => song.id === state.song.id);
@@ -78,32 +51,19 @@ export default function SongPlayer() {
     setIsUserSeeking(true);
   };
 
-<<<<<<< HEAD
   const handleSeekCommitted = (e, newValue) => {
     setIsUserSeeking(false);
     reactPlayerRef.current.seekTo(newValue);
-=======
-  const handleSeekMouseUp = () => {
-    setIsUserSeeking(false);
-    reactPlayerRef.current.seekTo(played);
->>>>>>> b3eb029f673d880add61f8329d07f6756d857994
   };
 
   const formatDuration = (seconds) => {
     const result = state.song.duration / 60;
     if (result >= 60) {
       if (result >= 600)
-<<<<<<< HEAD
         return new Date(seconds * 1000).toISOString().substr(11, 8);
       return new Date(seconds * 1000).toISOString().substr(12, 7);
     }
     return new Date(seconds * 1000).toISOString().substr(14, 5);
-=======
-        return new Date(seconds * 1000).toISOString().substr(11, 8); // HH:MM:SS
-      return new Date(seconds * 1000).toISOString().substr(12, 7); // H:MM:SS
-    }
-    return new Date(seconds * 1000).toISOString().substr(14, 5); // MM:SS
->>>>>>> b3eb029f673d880add61f8329d07f6756d857994
   };
 
   const handlePlayPrevSong = () => {
@@ -120,15 +80,9 @@ export default function SongPlayer() {
     }
   };
 
-<<<<<<< HEAD
   const handleToggleVideo = () => {
     setToggleVideo(!toggleVideo);
   };
-=======
-  function handleToggleVideo() {
-    setToggleVideo(!toggleVideo);
-  }
->>>>>>> b3eb029f673d880add61f8329d07f6756d857994
 
   const handleVolume = (event, newValue) => {
     setVolume(newValue);
@@ -201,66 +155,28 @@ export default function SongPlayer() {
           </div>
 
           <div style={{ display: "flex", alignItems: "center" }}>
-<<<<<<< HEAD
             <Typography variant="caption" component="h6" style={{ marginRight: 10 }}>
-=======
-            <Typography
-              variant="caption"
-              component="h6"
-              style={{ marginRight: 10 }}
-            >
->>>>>>> b3eb029f673d880add61f8329d07f6756d857994
               {formatDuration(playedSeconds)}
             </Typography>
             <Slider
               value={played}
-<<<<<<< HEAD
-=======
-              type="range"
->>>>>>> b3eb029f673d880add61f8329d07f6756d857994
               min={0}
               max={1}
               step={0.01}
               onChange={handleSliderProgressChange}
               onMouseDown={handleSeekMouseDown}
-<<<<<<< HEAD
               onChangeCommitted={handleSeekCommitted}
             />
             <Typography variant="caption" component="h6" style={{ marginLeft: 10 }}>
-=======
-              onMouseUp={handleSeekMouseUp}
-            />
-            <Typography
-              variant="caption"
-              component="h6"
-              style={{ marginLeft: 10 }}
-            >
->>>>>>> b3eb029f673d880add61f8329d07f6756d857994
               {formatDuration(state.song.duration)}
             </Typography>
           </div>
 
           <div
             hidden={toggleVideo}
-<<<<<<< HEAD
             style={{ position: "absolute", right: 50, marginTop: 40 }}
           >
             <div style={{ width: "20vw", height: "11.5vw", pointerEvents: "none" }}>
-=======
-            style={{
-              position: "absolute",
-              right: 50,
-              marginTop: 40,
-            }}
-          >
-            <div
-              style={{
-                width: "20vw",
-                height: "11.5vw",
-                pointerEvents: "none",
-              }}
-            >
->>>>>>> b3eb029f673d880add61f8329d07f6756d857994
               <ReactPlayer
                 width="100%"
                 height="100%"
@@ -275,10 +191,6 @@ export default function SongPlayer() {
                   }
                 }}
                 ref={reactPlayerRef}
-<<<<<<< HEAD
-=======
-                className={classes.songPlayer}
->>>>>>> b3eb029f673d880add61f8329d07f6756d857994
               />
             </div>
           </div>
@@ -287,10 +199,6 @@ export default function SongPlayer() {
           <Slider
             orientation="vertical"
             value={volume}
-<<<<<<< HEAD
-=======
-            type="range"
->>>>>>> b3eb029f673d880add61f8329d07f6756d857994
             min={0}
             max={1}
             step={0.01}
