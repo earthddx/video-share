@@ -1,40 +1,74 @@
-App created with **GraphQL(Hasura GraphiQL), Apollo** and **React**. Accepts youtube.com urls.
-Song queue is saved to local storage and being retrieved after page refresh.
+# Video Share
 
-Styling is done by using **Material-UI**
+A collaborative video playlist app built with **React 18**, **Apollo Client 3**, **GraphQL (Hasura)**, and **Material UI v5**.
 
-Deployed at https://confident-bhabha-15737c.netlify.com/
+Paste a YouTube, Vimeo, or SoundCloud URL to add songs to a shared playlist. The song list updates in real time for all connected users via a live WebSocket subscription.
 
-GraphQL data: https://apollo-react-music.herokuapp.com/console/data/schema/public/tables/songs/browse
-Please be aware that queries, mutations, subsciptions and data could be modified on the graphql endpoint and its not secured.
+## Features
 
-## How to add or remove data from the queue
+- Add songs from YouTube, Vimeo, or SoundCloud by URL
+- Real-time song list updates via GraphQL subscriptions (WebSocket)
+- Play, pause, and skip between songs
+- Personal queue saved to localStorage — persists across page refreshes
 
+## Tech Stack
 
-### client.js (ApolloClient)
+| Layer | Library |
+|---|---|
+| UI | React 18, Material UI v5 |
+| GraphQL client | Apollo Client 3 |
+| Subscriptions | `graphql-ws` over WebSocket |
+| Backend | Hasura GraphQL Engine |
+| Animations | react-useanimations |
+| Player | react-player |
 
-In<code>resolvers: Mutation</code> object with a property <code>addOrRemoveFromQueue</code> 3 paramateres are specified, where the first one isn't important in this case, second one is all the arguments and the last one is <code>cache</code>. It gives access to work directly with cache.
+## Getting Started
 
-We can take what is in there currently <code>queue:[]</code> and add songs. First, we read the queury of all the previous songs,
-then we check to see if we indeed have the queue and if the item is already in there <code>queue.some(song=>song.id === input.id)</code>, we want to remove it, otherwise add it <code>[...queue, input]</code>.
+```bash
+npm install
+npm start
+```
 
-To update cache , we write back the changes <code>cache.writeQuery({...})</code> and upon success the queue is returned.
+The app runs at `http://localhost:3000`.
 
+## How It Works
 
-### SongList.js
-To save queued song in to local storage:
+### Adding Songs
 
-<code>...onCompleted: data=>{localstorage.setItem('queue', data.addOrRemoveFromQueue)}</code>
+Paste a supported URL into the header input and click the **+** button. A dialog will confirm the song details (title, artist, thumbnail) before adding it to the shared playlist.
 
+### Queue (localStorage)
 
-The data is coming from  <code>addOrRemoveFromQueue</code> mutation and corresponds to <code>'queue'</code> key. In order to write the data that results in an array to local storage, we have to convert it in to a string instead <code>JSON.stringify(data.addOrRemoveFromQueue)</code> since local storage only accepts strings.
+Each user has a personal queue stored in `localStorage`. The queue is loaded on startup so it survives page refreshes. Adding or removing a song from the queue is handled by a client-side Apollo mutation (`addOrRemoveFromQueue`) that reads and writes directly to the Apollo cache, then syncs to `localStorage` via the `onCompleted` callback.
 
+### Real-Time Sync
 
-### QueuedSongList.js
-We use the same <code>onCompleted</code> callback as a second argument of the same mutation.
+The app connects to Hasura over a WebSocket using `GraphQLWsLink` from `@apollo/client/link/subscriptions`. Any song added by any user appears instantly in all open sessions.
 
+## Project Structure
 
+```
+src/
+  components/
+    AddSong.js          # URL input in the header
+    AddSongDialog.js    # Confirmation dialog before adding
+    Header.js           # Top bar with app title and AddSong
+    Song.js             # Single song card in the shared list
+    SongList.js         # Scrollable list of all songs
+    SongPlayer.js       # Audio/video player with queue controls
+    QueuedSongList.js   # Sidebar list of queued songs
+    AboutDialog.js      # Info dialog about the app
+  graphql/
+    client.js           # Apollo Client setup, local resolvers, queue init
+    queries.js          # GraphQL queries
+    mutations.js        # GraphQL mutations
+    subscriptions.js    # GraphQL subscriptions
+  App.js
+  reducer.js            # Song player state (current song, playing flag)
+  theme.js              # MUI theme customization
+```
 
-## Initial loading of the application
+## Notes
 
-In <code>client.js</code> file we check for the existing queue and assign it as a value to <code>queue</code> key and parse it back to an array. That allows the app to load the queue after page refresh (as long as its not deleted from the local storage manually).
+- The Hasura GraphQL endpoint is public and unauthenticated — do not store sensitive data.
+- The shared song list is visible and editable by anyone with the app URL.
