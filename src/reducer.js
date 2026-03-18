@@ -18,6 +18,15 @@ const songReducer = (state, action) => {
         song: action.payload.song,
       };
     }
+    case "SET_PLAYED_SECONDS": {
+      return { ...state, playedSeconds: action.payload.playedSeconds };
+    }
+    case "EXPAND_VIDEO": {
+      return { ...state, isVideoExpanded: true };
+    }
+    case "COLLAPSE_VIDEO": {
+      return { ...state, isVideoExpanded: false };
+    }
     default:
       return state;
   }
