@@ -1,0 +1,38 @@
+{
+  "files": {
+    "main.js": "/earthddx/MusicShare/static/js/main.3da6440f.js",
+    "reactPlayerYouTube.js": "/earthddx/MusicShare/static/js/reactPlayerYouTube.0a8f9765.chunk.js",
+    "reactPlayerSoundCloud.js": "/earthddx/MusicShare/static/js/reactPlayerSoundCloud.2930c3a7.chunk.js",
+    "reactPlayerVimeo.js": "/earthddx/MusicShare/static/js/reactPlayerVimeo.7ac8d951.chunk.js",
+    "reactPlayerMux.js": "/earthddx/MusicShare/static/js/reactPlayerMux.e01baa6c.chunk.js",
+    "reactPlayerFacebook.js": "/earthddx/MusicShare/static/js/reactPlayerFacebook.bf2a8cd9.chunk.js",
+    "reactPlayerStreamable.js": "/earthddx/MusicShare/static/js/reactPlayerStreamable.ced0a830.chunk.js",
+    "reactPlayerWistia.js": "/earthddx/MusicShare/static/js/reactPlayerWistia.0b69a00f.chunk.js",
+    "reactPlayerTwitch.js": "/earthddx/MusicShare/static/js/reactPlayerTwitch.28c6e67e.chunk.js",
+    "reactPlayerDailyMotion.js": "/earthddx/MusicShare/static/js/reactPlayerDailyMotion.c90d2b2b.chunk.js",
+    "reactPlayerMixcloud.js": "/earthddx/MusicShare/static/js/reactPlayerMixcloud.77cd2ef3.chunk.js",
+    "reactPlayerVidyard.js": "/earthddx/MusicShare/static/js/reactPlayerVidyard.0a752cfb.chunk.js",
+    "reactPlayerKaltura.js": "/earthddx/MusicShare/static/js/reactPlayerKaltura.7ceaec57.chunk.js",
+    "reactPlayerFilePlayer.js": "/earthddx/MusicShare/static/js/reactPlayerFilePlayer.99fb136c.chunk.js",
+    "reactPlayerPreview.js": "/earthddx/MusicShare/static/js/reactPlayerPreview.24202b0b.chunk.js",
+    "index.html": "/earthddx/MusicShare/index.html",
+    "main.3da6440f.js.map": "/earthddx/MusicShare/static/js/main.3da6440f.js.map",
+    "reactPlayerYouTube.0a8f9765.chunk.js.map": "/earthddx/MusicShare/static/js/reactPlayerYouTube.0a8f9765.chunk.js.map",
+    "reactPlayerSoundCloud.2930c3a7.chunk.js.map": "/earthddx/MusicShare/static/js/reactPlayerSoundCloud.2930c3a7.chunk.js.map",
+    "reactPlayerVimeo.7ac8d951.chunk.js.map": "/earthddx/MusicShare/static/js/reactPlayerVimeo.7ac8d951.chunk.js.map",
+    "reactPlayerMux.e01baa6c.chunk.js.map": "/earthddx/MusicShare/static/js/reactPlayerMux.e01baa6c.chunk.js.map",
+    "reactPlayerFacebook.bf2a8cd9.chunk.js.map": "/earthddx/MusicShare/static/js/reactPlayerFacebook.bf2a8cd9.chunk.js.map",
+    "reactPlayerStreamable.ced0a830.chunk.js.map": "/earthddx/MusicShare/static/js/reactPlayerStreamable.ced0a830.chunk.js.map",
+    "reactPlayerWistia.0b69a00f.chunk.js.map": "/earthddx/MusicShare/static/js/reactPlayerWistia.0b69a00f.chunk.js.map",
+    "reactPlayerTwitch.28c6e67e.chunk.js.map": "/earthddx/MusicShare/static/js/reactPlayerTwitch.28c6e67e.chunk.js.map",
+    "reactPlayerDailyMotion.c90d2b2b.chunk.js.map": "/earthddx/MusicShare/static/js/reactPlayerDailyMotion.c90d2b2b.chunk.js.map",
+    "reactPlayerMixcloud.77cd2ef3.chunk.js.map": "/earthddx/MusicShare/static/js/reactPlayerMixcloud.77cd2ef3.chunk.js.map",
+    "reactPlayerVidyard.0a752cfb.chunk.js.map": "/earthddx/MusicShare/static/js/reactPlayerVidyard.0a752cfb.chunk.js.map",
+    "reactPlayerKaltura.7ceaec57.chunk.js.map": "/earthddx/MusicShare/static/js/reactPlayerKaltura.7ceaec57.chunk.js.map",
+    "reactPlayerFilePlayer.99fb136c.chunk.js.map": "/earthddx/MusicShare/static/js/reactPlayerFilePlayer.99fb136c.chunk.js.map",
+    "reactPlayerPreview.24202b0b.chunk.js.map": "/earthddx/MusicShare/static/js/reactPlayerPreview.24202b0b.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.3da6440f.js"
+  ]
+}
