@@ -1,50 +1,68 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   Typography,
-  Card,
-  CardContent,
-  CardActions,
   Avatar,
   Collapse,
   IconButton,
+  Chip,
+  Divider,
+  Box,
   Tooltip,
 } from "@mui/material";
-import { Cancel, ExpandMore, QueueMusic } from "@mui/icons-material";
-import { useMutation } from "@apollo/client";
+import { Cancel, ExpandMore, QueueMusic, PlayArrow, VolumeUp, DeleteSweep } from "@mui/icons-material";
+import { useMutation, useApolloClient } from "@apollo/client";
+import { SongContext } from "../App";
 
 import { ADD_OR_REMOVE_SONG_FROM_QUEUE } from "../graphql/mutations";
+import { GET_QUEUED_SONGS } from "../graphql/queries";
 
 export default function QueuedSongList({ queue }) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
+  const client = useApolloClient();
 
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
+  const handleClearQueue = (e) => {
+    e.stopPropagation();
+    client.cache.writeQuery({ query: GET_QUEUED_SONGS, data: { queue: [] } });
+    localStorage.setItem("queue", JSON.stringify([]));
   };
 
   return (
     queue.length > 0 && (
-      <div style={{ margin: "0 auto" }}>
-        <div style={{ maxWidth: 275, minWidth: 275 }}>
-          <CardActions disableSpacing>
-            <Typography color="textPrimary">
-              {expanded ? (
-                <span style={{ fontWeight: 100 }}>
-                  {queue.length} queued {queue.length === 1 ? "song" : "songs"}
-                </span>
-              ) : (
-                <span style={{ fontWeight: 100 }}>
-                  <Tooltip title="Queue">
-                    <QueueMusic style={{ fontSize: 34 }} />
-                  </Tooltip>
-                </span>
-              )}
-            </Typography>
+      <Box sx={{ px: 2, pt: 2 }}>
+        {/* Header */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            mb: 1,
+            cursor: "pointer",
+            userSelect: "none",
+          }}
+          onClick={() => setExpanded((v) => !v)}
+        >
+          <QueueMusic sx={{ color: "text.secondary", fontSize: 20 }} />
+          <Typography
+            variant="overline"
+            sx={{ letterSpacing: 1.5, color: "text.secondary", lineHeight: 1 }}
+          >
+            Up Next
+          </Typography>
+          <Chip
+            label={queue.length}
+            size="small"
+            sx={{ ml: 0.5, height: 18, fontSize: 11, fontWeight: 600 }}
+          />
+          <Box sx={{ ml: "auto", display: "flex", alignItems: "center" }}>
+            <Tooltip title="Clear queue">
+              <IconButton size="small" onClick={handleClearQueue} sx={{ color: "text.disabled", "&:hover": { color: "error.main" } }}>
+                <DeleteSweep fontSize="small" />
+              </IconButton>
+            </Tooltip>
             <IconButton
-              onClick={handleExpandClick}
+              size="small"
               aria-expanded={expanded}
-              aria-label="show more"
               sx={{
-                marginLeft: "auto",
                 transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
                 transition: (theme) =>
                   theme.transitions.create("transform", {
@@ -52,74 +70,140 @@ export default function QueuedSongList({ queue }) {
                   }),
               }}
             >
-              <ExpandMore />
+              <ExpandMore fontSize="small" />
             </IconButton>
-          </CardActions>
+          </Box>
+        </Box>
 
-          <Collapse in={expanded} timeout="auto" unmountOnExit>
-            <Card>
-              <CardContent>
-                {queue.map((song, i) => (
-                  <QueuedSong key={i} song={song} />
-                ))}
-              </CardContent>
-            </Card>
-          </Collapse>
-        </div>
-      </div>
+        <Collapse in={expanded} timeout="auto" unmountOnExit>
+          <Divider sx={{ mb: 1 }} />
+          {/* Scrollable list */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 0.5,
+              maxHeight: 420,
+              overflowY: "auto",
+              overflowX: "hidden",
+              pr: 0.5,
+              "&::-webkit-scrollbar": { width: 4 },
+              "&::-webkit-scrollbar-track": { bgcolor: "transparent" },
+              "&::-webkit-scrollbar-thumb": { bgcolor: "action.disabled", borderRadius: 2 },
+            }}
+          >
+            {queue.map((song, i) => (
+              <QueuedSong key={i} song={song} />
+            ))}
+          </Box>
+        </Collapse>
+      </Box>
     )
   );
 }
 
 function QueuedSong({ song }) {
-  const { thumbnail, artist, title } = song;
+  const { thumbnail, artist, title, duration } = song;
+  const { state, dispatch } = useContext(SongContext);
+  const isCurrentSong = !!state.song.id && song.id === state.song.id;
+  const progress = isCurrentSong && duration > 0 ? state.playedSeconds / duration : 0;
+
   const [addOrRemoveFromQueue] = useMutation(ADD_OR_REMOVE_SONG_FROM_QUEUE, {
     onCompleted: (data) => {
       localStorage.setItem("queue", JSON.stringify(data.addOrRemoveFromQueue));
     },
   });
 
-  const handleRemoveFromQueue = () => {
+  const handlePlay = () => {
+    dispatch({ type: "SET_SONG", payload: { song } });
+    dispatch({ type: "PLAY_SONG" });
+  };
+
+  const handleRemoveFromQueue = (e) => {
+    e.stopPropagation();
     addOrRemoveFromQueue({
       variables: { input: { ...song, __typename: "Song" } },
     });
   };
 
   return (
-    <div
-      style={{
-        display: "grid",
-        gridAutoFlow: "column",
-        gridTemplateColumns: "50px auto 50px",
-        gap: 12,
+    <Box
+      onClick={handlePlay}
+      sx={{
+        display: "flex",
         alignItems: "center",
-        marginTop: 10,
+        gap: 1.5,
+        px: 1,
+        py: 0.75,
+        borderRadius: 1,
+        cursor: "pointer",
+        bgcolor: isCurrentSong ? "action.selected" : "transparent",
+        "&:hover": { bgcolor: isCurrentSong ? "action.selected" : "action.hover" },
+        transition: "background-color 0.15s",
       }}
     >
-      <Avatar
-        variant="square"
-        src={thumbnail}
-        alt="song thumbnail"
-        sx={{ width: 44, height: 44 }}
-      />
-      <div style={{ overflow: "hidden", whiteSpace: "nowrap" }}>
+      {/* Thumbnail with overlay + progress bar */}
+      <Box sx={{ position: "relative", flexShrink: 0, width: 40, height: 40 }}>
+        <Avatar
+          variant="rounded"
+          src={thumbnail}
+          alt="song thumbnail"
+          sx={{ width: 40, height: 40, borderRadius: 1 }}
+        />
+        {isCurrentSong && (
+          <Box
+            sx={{
+              position: "absolute", inset: 0, borderRadius: 1,
+              bgcolor: "rgba(0,0,0,0.45)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}
+          >
+            {state.isPlaying
+              ? <VolumeUp sx={{ fontSize: 18, color: "primary.main" }} />
+              : <PlayArrow sx={{ fontSize: 18, color: "white" }} />}
+          </Box>
+        )}
+        {/* Progress bar along the bottom edge of thumbnail */}
+        {isCurrentSong && (
+          <Box
+            sx={{
+              position: "absolute", bottom: 0, left: 0, right: 0,
+              height: 3, borderRadius: "0 0 4px 4px", bgcolor: "rgba(0,0,0,0.4)",
+              overflow: "hidden",
+            }}
+          >
+            <Box
+              sx={{
+                height: "100%",
+                width: `${progress * 100}%`,
+                bgcolor: "primary.main",
+                transition: "width 1s linear",
+              }}
+            />
+          </Box>
+        )}
+      </Box>
+
+      <Box sx={{ flex: 1, overflow: "hidden" }}>
         <Typography
-          variant="subtitle2"
-          sx={{ textOverflow: "ellipsis", overflow: "hidden" }}
+          variant="body2"
+          fontWeight={isCurrentSong ? 600 : 500}
+          noWrap
+          color={isCurrentSong ? "primary.main" : "text.primary"}
         >
           {title}
         </Typography>
-        <Typography
-          variant="body2"
-          color="textSecondary"
-          sx={{ textOverflow: "ellipsis", overflow: "hidden" }}
-        >
+        <Typography variant="caption" color="text.secondary" noWrap display="block">
           {artist}
         </Typography>
-      </div>
-      <IconButton onClick={handleRemoveFromQueue}>
-        <Cancel color="primary" />
+      </Box>
+      <IconButton
+        size="small"
+        onClick={handleRemoveFromQueue}
+        sx={{ color: "text.disabled", flexShrink: 0, "&:hover": { color: "error.main" } }}
+      >
+        <Cancel fontSize="small" />
       </IconButton>
-    </div>
+    </Box>
   );
 }
