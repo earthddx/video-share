@@ -94,7 +94,7 @@ export default function AddSongDialog({
         />
       </DialogContent>
       <DialogActions>
-        <Button color="secondary" onClick={handleCloseDialog}>
+        <Button color="inherit" onClick={handleCloseDialog}>
           Cancel
         </Button>
         <Button color="primary" variant="contained" onClick={handleAddSong}>
