@@ -1,8 +1,8 @@
 {
-  "name": "music-react",
+  "name": "video-react",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://earthddx.github.io/MusicShare",
+  "homepage": "https://earthddx.github.io/video-share",
   "dependencies": {
     "@apollo/client": "^3.11.8",
     "@emotion/react": "^11.13.3",
