@@ -21,7 +21,8 @@ export default function AddSong() {
     setPlayable(isPlayable);
   }, [url]);
 
-  const handleEditSong = ({ player }) => {
+  const handleEditSong = async ({ player }) => {
+    // YouTube — use player API for full metadata
     try {
       const nestedPlayer = player.player.player;
       if (typeof nestedPlayer.getDuration === "function") {
@@ -32,11 +33,48 @@ export default function AddSong() {
         return;
       }
     } catch (_) {}
+
+    // Vimeo — oEmbed API
+    if (/vimeo\.com/.test(url)) {
+      try {
+        const res = await fetch(
+          `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(url)}`
+        );
+        const data = await res.json();
+        setSong((prev) => ({
+          ...prev,
+          url,
+          title: data.title || "",
+          thumbnail: data.thumbnail_url || "",
+          duration: data.duration || 0,
+        }));
+        return;
+      } catch (_) {}
+    }
+
+    // SoundCloud — oEmbed API
+    if (/soundcloud\.com/.test(url)) {
+      try {
+        const res = await fetch(
+          `https://soundcloud.com/oembed?url=${encodeURIComponent(url)}&format=json`
+        );
+        const data = await res.json();
+        setSong((prev) => ({
+          ...prev,
+          url,
+          title: data.title || "",
+          thumbnail: data.thumbnail_url || "",
+        }));
+        return;
+      } catch (_) {}
+    }
+
+    // Fallback — no metadata available
     setSong((prev) => ({ ...prev, url }));
   };
 
   return (
-    <div style={{ display: "flex", alignItems: "center" }}>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
       <AddSongDialog
         url={url}
         setUrl={setUrl}
@@ -52,7 +90,7 @@ export default function AddSong() {
         label="Add song or video URL"
         variant="filled"
         type="url"
-        sx={{ margin: 2 }}
+        sx={{ mx: 2, my: 0, maxWidth: 500 }}
         onChange={(e) => setUrl(e.target.value)}
         value={url}
       />
