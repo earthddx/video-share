@@ -3,7 +3,7 @@ import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { createClient } from "graphql-ws";
 import { GET_QUEUED_SONGS } from "./queries";
 
-const GRAPHQL_ENDPOINT = "wss://apollo-react-music.herokuapp.com/v1/graphql";
+const GRAPHQL_ENDPOINT = "wss://enormous-catfish-15.hasura.app/v1/graphql";
 
 const cache = new InMemoryCache();
 
@@ -11,6 +11,11 @@ const client = new ApolloClient({
   link: new GraphQLWsLink(
     createClient({
       url: GRAPHQL_ENDPOINT,
+      connectionParams: {
+        headers: {
+          "x-hasura-role": "public",
+        },
+      },
     })
   ),
   cache,
