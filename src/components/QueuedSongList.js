@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
 import {
   Typography,
   Avatar,
@@ -27,32 +27,32 @@ export default function QueuedSongList({ queue }) {
   };
 
   return (
-    queue.length > 0 && (
-      <Box sx={{ px: 2, pt: 2 }}>
-        {/* Header */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-            mb: 1,
-            cursor: "pointer",
-            userSelect: "none",
-          }}
-          onClick={() => setExpanded((v) => !v)}
+    <Box sx={{ px: 2, pt: 2 }}>
+      {/* Header */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          mb: 1,
+          cursor: queue.length > 0 ? "pointer" : "default",
+          userSelect: "none",
+        }}
+        onClick={() => queue.length > 0 && setExpanded((v) => !v)}
+      >
+        <QueueMusic sx={{ color: "text.secondary", fontSize: 20 }} />
+        <Typography
+          variant="overline"
+          sx={{ letterSpacing: 1.5, color: "text.secondary", lineHeight: 1 }}
         >
-          <QueueMusic sx={{ color: "text.secondary", fontSize: 20 }} />
-          <Typography
-            variant="overline"
-            sx={{ letterSpacing: 1.5, color: "text.secondary", lineHeight: 1 }}
-          >
-            Up Next
-          </Typography>
-          <Chip
-            label={queue.length}
-            size="small"
-            sx={{ ml: 0.5, height: 18, fontSize: 11, fontWeight: 600 }}
-          />
+          Up Next
+        </Typography>
+        <Chip
+          label={queue.length}
+          size="small"
+          sx={{ ml: 0.5, height: 18, fontSize: 11, fontWeight: 600 }}
+        />
+        {queue.length > 0 && (
           <Box sx={{ ml: "auto", display: "flex", alignItems: "center" }}>
             <Tooltip title="Clear queue">
               <IconButton size="small" onClick={handleClearQueue} sx={{ color: "text.disabled", "&:hover": { color: "error.main" } }}>
@@ -73,32 +73,32 @@ export default function QueuedSongList({ queue }) {
               <ExpandMore fontSize="small" />
             </IconButton>
           </Box>
-        </Box>
-
-        <Collapse in={expanded} timeout="auto" unmountOnExit>
-          <Divider sx={{ mb: 1 }} />
-          {/* Scrollable list */}
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 0.5,
-              maxHeight: 420,
-              overflowY: "auto",
-              overflowX: "hidden",
-              pr: 0.5,
-              "&::-webkit-scrollbar": { width: 4 },
-              "&::-webkit-scrollbar-track": { bgcolor: "transparent" },
-              "&::-webkit-scrollbar-thumb": { bgcolor: "action.disabled", borderRadius: 2 },
-            }}
-          >
-            {queue.map((song, i) => (
-              <QueuedSong key={i} song={song} />
-            ))}
-          </Box>
-        </Collapse>
+        )}
       </Box>
-    )
+
+      <Collapse in={expanded && queue.length > 0} timeout="auto" unmountOnExit>
+        <Divider sx={{ mb: 1 }} />
+        {/* Scrollable list */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 0.5,
+            maxHeight: 420,
+            overflowY: "auto",
+            overflowX: "hidden",
+            pr: 0.5,
+            "&::-webkit-scrollbar": { width: 4 },
+            "&::-webkit-scrollbar-track": { bgcolor: "transparent" },
+            "&::-webkit-scrollbar-thumb": { bgcolor: "action.disabled", borderRadius: 2 },
+          }}
+        >
+          {queue.map((song, i) => (
+            <QueuedSong key={i} song={song} />
+          ))}
+        </Box>
+      </Collapse>
+    </Box>
   );
 }
 
