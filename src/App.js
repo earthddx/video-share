@@ -18,6 +18,8 @@ export const SongContext = createContext({
     url: "",
   },
   isPlaying: false,
+  playedSeconds: 0,
+  isVideoExpanded: false,
 });
 
 function App() {
@@ -29,32 +31,18 @@ function App() {
   return (
     <SongContext.Provider value={{ state, dispatch }}>
       <Header />
-      <Grid container>
+      <Grid
+        container
+        sx={{ pt: 'calc(64px + 16px)', px: { xs: 1, sm: 2 } }}
+      >
         {greaterThanMd && (
-          <Grid
-            item
-            md={3}
-            style={{
-              paddingTop: 80,
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
+          <Grid item md={3}>
             <QueudSongList queue={data?.queue ?? []} />
           </Grid>
         )}
-        <Grid
-          item
-          xs={12}
-          sm={12}
-          md={6}
-          style={{
-            paddingTop: 100,
-          }}
-        >
+        <Grid item xs={12} md={9}>
           <SongList queue={data?.queue ?? []} />
         </Grid>
-        <Grid item md={3} />
       </Grid>
     </SongContext.Provider>
   );
