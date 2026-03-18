@@ -31,14 +31,14 @@ export default function AddSongDialog({
 
   const handleAddSong = async () => {
     try {
-      const { title, artist, thumbnail, url, duration } = song;
+      const { title, artist, thumbnail, duration } = song;
       await addSong({
         variables: {
-          url: url.length > 0 ? url : null,
-          thumbnail: thumbnail.length > 0 ? thumbnail : null,
-          duration: duration > 0 ? duration : null,
-          title: title.length > 0 ? title : null,
-          artist: artist.length > 0 ? artist : null,
+          url: url || "",
+          thumbnail: thumbnail || "",
+          duration: duration || 0,
+          title: title || "",
+          artist: artist || "",
         },
       });
       handleCloseDialog();
@@ -91,14 +91,6 @@ export default function AddSongDialog({
           onChange={handleChangeSong}
           error={handleError("title")}
           helperText={handleError("title") && "Title field cannot be empty"}
-        />
-        <TextField
-          value={thumbnail}
-          margin="dense"
-          name="thumbnail"
-          label="Thumbnail URL"
-          fullWidth
-          onChange={handleChangeSong}
         />
       </DialogContent>
       <DialogActions>
