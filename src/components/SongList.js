@@ -13,14 +13,7 @@ export default function SongList({ queue }) {
 
   if (loading) {
     return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          marginTop: 250,
-        }}
-      >
+      <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
         <CircularProgress size="10rem" />
       </div>
     );
@@ -37,14 +30,12 @@ export default function SongList({ queue }) {
   };
 
   return (
-    <div>
-      <Grid container spacing={0}>
-        {data.songs.map((song) => (
-          <Grid item md={4} key={song.id}>
-            <Song song={song} handleDeleteSong={handleDeleteSong} queue={queue} />
-          </Grid>
-        ))}
-      </Grid>
-    </div>
+    <Grid container spacing={2}>
+      {data.songs.map((song) => (
+        <Grid item xs={12} sm={6} md={4} key={song.id}>
+          <Song song={song} handleDeleteSong={handleDeleteSong} queue={queue} />
+        </Grid>
+      ))}
+    </Grid>
   );
 }

@@ -1,5 +1,5 @@
-import React, { useContext, useState, useRef, useEffect } from "react";
-import { Typography, IconButton, Slider, Tooltip } from "@mui/material";
+import { useContext, useState, useRef, useEffect, Suspense } from "react";
+import { Typography, IconButton, Slider, Tooltip, Box } from "@mui/material";
 import {
   SkipPrevious,
   SkipNext,
@@ -43,7 +43,7 @@ export default function SongPlayer() {
     dispatch(state.isPlaying ? { type: "PAUSE_SONG" } : { type: "PLAY_SONG" });
   };
 
-  const handleSliderProgressChange = (e, newValue) => {
+  const handleSliderProgressChange = (_, newValue) => {
     setPlayed(newValue);
   };
 
@@ -51,7 +51,7 @@ export default function SongPlayer() {
     setIsUserSeeking(true);
   };
 
-  const handleSeekCommitted = (e, newValue) => {
+  const handleSeekCommitted = (_, newValue) => {
     setIsUserSeeking(false);
     reactPlayerRef.current.seekTo(newValue);
   };
@@ -60,10 +60,10 @@ export default function SongPlayer() {
     const result = state.song.duration / 60;
     if (result >= 60) {
       if (result >= 600)
-        return new Date(seconds * 1000).toISOString().substr(11, 8);
-      return new Date(seconds * 1000).toISOString().substr(12, 7);
+        return new Date(seconds * 1000).toISOString().slice(11, 19);
+      return new Date(seconds * 1000).toISOString().slice(12, 19);
     }
-    return new Date(seconds * 1000).toISOString().substr(14, 5);
+    return new Date(seconds * 1000).toISOString().slice(14, 19);
   };
 
   const handlePlayPrevSong = () => {
@@ -84,7 +84,7 @@ export default function SongPlayer() {
     setToggleVideo(!toggleVideo);
   };
 
-  const handleVolume = (event, newValue) => {
+  const handleVolume = (_, newValue) => {
     setVolume(newValue);
   };
 
@@ -172,11 +172,36 @@ export default function SongPlayer() {
             </Typography>
           </div>
 
-          <div
-            hidden={toggleVideo}
-            style={{ position: "absolute", right: 50, marginTop: 40 }}
+          {/* Backdrop when expanded */}
+          {state.isVideoExpanded && (
+            <Box
+              onClick={() => dispatch({ type: "COLLAPSE_VIDEO" })}
+              sx={{ position: "fixed", inset: 0, bgcolor: "rgba(0,0,0,0.85)", zIndex: 1300 }}
+            />
+          )}
+
+          {/* Single ReactPlayer — repositions via CSS, never remounts */}
+          <Box
+            sx={state.isVideoExpanded ? {
+              position: "fixed",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "80vw",
+              height: "45vw",
+              zIndex: 1301,
+              pointerEvents: "auto",
+            } : {
+              position: "absolute",
+              right: 50,
+              marginTop: "40px",
+              width: "20vw",
+              height: "11.5vw",
+              pointerEvents: "none",
+              display: toggleVideo ? "none" : "block",
+            }}
           >
-            <div style={{ width: "20vw", height: "11.5vw", pointerEvents: "none" }}>
+            <Suspense fallback={null}>
               <ReactPlayer
                 width="100%"
                 height="100%"
@@ -184,16 +209,18 @@ export default function SongPlayer() {
                 url={state.song.url}
                 playing={state.isPlaying}
                 volume={volume}
+                controls={state.isVideoExpanded}
                 onProgress={({ played, playedSeconds }) => {
                   if (!isUserSeeking) {
                     setPlayed(played);
                     setPlayedSeconds(playedSeconds);
+                    dispatch({ type: "SET_PLAYED_SECONDS", payload: { playedSeconds } });
                   }
                 }}
                 ref={reactPlayerRef}
               />
-            </div>
-          </div>
+            </Suspense>
+          </Box>
         </div>
         <div style={{ height: 50, marginTop: 20 }}>
           <Slider
