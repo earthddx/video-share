@@ -2,7 +2,7 @@
   "name": "music-react",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://github.com/earthddx/MusicShare",
+  "homepage": "https://earthddx.github.io/MusicShare",
   "dependencies": {
     "@apollo/client": "^3.11.8",
     "@emotion/react": "^11.13.3",
