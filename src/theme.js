@@ -7,6 +7,9 @@ const theme = createTheme({
     primary: { main: red[700] },
     secondary: { main: grey[900] },
   },
+  shape: {
+    borderRadius: 8,
+  },
   typography: {
     fontFamily: "Roboto",
   },
