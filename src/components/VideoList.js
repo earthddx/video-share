@@ -2,14 +2,14 @@ import React from "react";
 import { Grid, CircularProgress } from "@mui/material";
 import { useSubscription, useMutation } from "@apollo/client";
 
-import { GET_SONGS } from "../graphql/subscriptions";
-import { DELETE_SONG } from "../graphql/mutations";
+import { GET_VIDEOS} from "../graphql/subscriptions";
+import { DELETE_VIDEO } from "../graphql/mutations";
 
-import Song from "./Song";
+import Video from "./Video";
 
-export default function SongList({ queue }) {
-  const { data, loading, error } = useSubscription(GET_SONGS);
-  const [deleteSong] = useMutation(DELETE_SONG);
+export default function VideoList({ queue }) {
+  const { data, loading, error } = useSubscription(GET_VIDEOS);
+  const [deleteVideo] = useMutation(DELETE_VIDEO);
 
   if (loading) {
     return (
@@ -20,20 +20,20 @@ export default function SongList({ queue }) {
   }
 
   if (error) {
-    return <div>Error fetching songs</div>;
+    return <div>Error fetching videos</div>;
   }
 
-  const handleDeleteSong = (id) => {
+  const handleDeleteVideo = (id) => {
     if (window.confirm("Are you sure you want to delete this?")) {
-      deleteSong({ variables: { id } });
+      deleteVideo({ variables: { id } });
     }
   };
 
   return (
-    <Grid container spacing={2}>
-      {data.songs.map((song) => (
-        <Grid item xs={12} sm={6} md={4} key={song.id}>
-          <Song song={song} handleDeleteSong={handleDeleteSong} queue={queue} />
+    <Grid container spacing={3}>
+      {data.videos.map((video) => (
+        <Grid item xs={12} sm={6} md={4} key={video.id}>
+          <Video video={video} handleDeleteVideo={handleDeleteVideo} queue={queue} />
         </Grid>
       ))}
     </Grid>

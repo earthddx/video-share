@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AppBar, Toolbar, Typography, Grid, useMediaQuery, Button } from "@mui/material";
 import { YouTube, InfoOutlined } from "@mui/icons-material";
 
-import AddSong from "./AddSong";
+import AddVideo from "./AddVideo";
 import AboutDialog from "./AboutDialog";
 
 export default function Header() {
@@ -23,7 +23,7 @@ export default function Header() {
           </Grid>
         )}
         <Grid item xs={12} md={greaterThanMd ? 8 : 12} sx={{ px: 2 }}>
-          <AddSong />
+          <AddVideo />
         </Grid>
         {greaterThanMd && (
           <Grid item md={2} sx={{ display: "flex", justifyContent: "center" }}>

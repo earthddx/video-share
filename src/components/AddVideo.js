@@ -3,13 +3,13 @@ import { TextField, Button } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import ReactPlayer from "react-player";
 
-import AddSongDialog from "./AddSongDialog";
+import AddVideoDialog from "./AddVideoDialog";
 
-export default function AddSong() {
+export default function AddVideo() {
   const [dialog, setDialog] = useState(false);
   const [url, setUrl] = useState("");
   const [playable, setPlayable] = useState(false);
-  const [song, setSong] = useState({
+  const [video, setVideo] = useState({
     duration: 0,
     title: "",
     artist: "",
@@ -21,7 +21,7 @@ export default function AddSong() {
     setPlayable(isPlayable);
   }, [url]);
 
-  const handleEditSong = async ({ player }) => {
+  const handleEditVideo = async ({ player }) => {
     // YouTube — use player API for full metadata
     try {
       const nestedPlayer = player.player.player;
@@ -29,7 +29,7 @@ export default function AddSong() {
         const duration = nestedPlayer.getDuration();
         const { title, video_id, author } = nestedPlayer.getVideoData();
         const thumbnail = `https://img.youtube.com/vi/${video_id}/0.jpg`;
-        setSong({ duration, title, artist: author, thumbnail, url });
+        setVideo({ duration, title, artist: author, thumbnail, url });
         return;
       }
     } catch (_) {}
@@ -38,10 +38,10 @@ export default function AddSong() {
     if (/vimeo\.com/.test(url)) {
       try {
         const res = await fetch(
-          `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(url)}`
+          `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(url)}`,
         );
         const data = await res.json();
-        setSong((prev) => ({
+        setVideo((prev) => ({
           ...prev,
           url,
           title: data.title || "",
@@ -56,10 +56,10 @@ export default function AddSong() {
     if (/soundcloud\.com/.test(url)) {
       try {
         const res = await fetch(
-          `https://soundcloud.com/oembed?url=${encodeURIComponent(url)}&format=json`
+          `https://soundcloud.com/oembed?url=${encodeURIComponent(url)}&format=json`,
         );
         const data = await res.json();
-        setSong((prev) => ({
+        setVideo((prev) => ({
           ...prev,
           url,
           title: data.title || "",
@@ -70,24 +70,30 @@ export default function AddSong() {
     }
 
     // Fallback — no metadata available
-    setSong((prev) => ({ ...prev, url }));
+    setVideo((prev) => ({ ...prev, url }));
   };
 
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <AddSongDialog
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <AddVideoDialog
         url={url}
         setUrl={setUrl}
         setDialog={setDialog}
         dialog={dialog}
-        song={song}
-        setSong={setSong}
+        video={video}
+        setVideo={setVideo}
       />
       <TextField
         fullWidth
         margin="normal"
         size="small"
-        label="Add song or video URL"
+        label="Add video URL"
         variant="filled"
         type="url"
         sx={{ mx: 2, my: 0, maxWidth: 500 }}
@@ -102,7 +108,7 @@ export default function AddSong() {
       >
         <Add />
       </Button>
-      <ReactPlayer url={url} hidden onReady={handleEditSong} />
+      <ReactPlayer url={url} hidden onReady={handleEditVideo} />
     </div>
   );
 }

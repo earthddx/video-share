@@ -19,11 +19,11 @@ export default function AboutDialog({ open, onClose }) {
         <Typography variant="body2" paragraph>
           Video Share lets you build a collaborative playlist from YouTube,
           Vimeo, and SoundCloud links. Paste a URL into the header, hit the{" "}
-          <strong>+</strong> button to confirm the song details, and it is added
+          <strong>+</strong> button to confirm the video details, and it is added
           to the shared list for everyone to see.
         </Typography>
         <Typography variant="body2" paragraph>
-          Click the play button on any song to start listening. Songs can be
+          Click the play button on any video to start listening. Videos can be
           added to your personal queue using the queue icon, and the player
           supports play/pause and skipping between queued tracks.
         </Typography>
@@ -32,7 +32,7 @@ export default function AboutDialog({ open, onClose }) {
           Where data is stored
         </Typography>
         <Typography variant="body2" paragraph>
-          Songs are stored in a{" "}
+          Videos are stored in a{" "}
           <Link
             href="https://hasura.io"
             target="_blank"
@@ -41,7 +41,7 @@ export default function AboutDialog({ open, onClose }) {
             Hasura
           </Link>{" "}
           GraphQL database. The app connects over a live WebSocket subscription
-          so the song list updates in real time across all open sessions.
+          so the video list updates in real time across all open sessions.
         </Typography>
         <Typography variant="body2">
           Your personal playback queue is saved to{" "}

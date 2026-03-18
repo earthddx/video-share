@@ -9,30 +9,30 @@ import {
 } from "@mui/material";
 import { useMutation } from "@apollo/client";
 
-import { ADD_SONG } from "../graphql/mutations";
+import { ADD_VIDEO } from "../graphql/mutations";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function AddSongDialog({
+export default function AddVideoDialog({
   url,
   setUrl,
   dialog,
   setDialog,
-  song,
-  setSong,
+  video,
+  setVideo,
 }) {
-  const [addSong, { error }] = useMutation(ADD_SONG);
+  const [addVideo, { error }] = useMutation(ADD_VIDEO);
 
   const handleCloseDialog = () => {
     setDialog(false);
   };
 
-  const handleAddSong = async () => {
+  const handleAddVideo = async () => {
     try {
-      const { title, artist, thumbnail, duration } = song;
-      await addSong({
+      const { title, artist, thumbnail, duration } = video;
+      await addVideo({
         variables: {
           url: url || "",
           thumbnail: thumbnail || "",
@@ -42,23 +42,23 @@ export default function AddSongDialog({
         },
       });
       handleCloseDialog();
-      setSong({ duration: 0, title: "", artist: "", thumbnail: "" });
+      setVideo({ duration: 0, title: "", artist: "", thumbnail: "" });
       setUrl("");
     } catch (error) {
-      console.error("Error adding song", error);
+      console.error("Error adding video", error);
     }
   };
 
-  const handleChangeSong = (e) => {
+  const handleChangeVideo = (e) => {
     const { name, value } = e.target;
-    setSong((prevState) => ({ ...prevState, [name]: value }));
+    setVideo((prevState) => ({ ...prevState, [name]: value }));
   };
 
   const handleError = (field) => {
     return error?.networkError?.extensions?.path.includes(field);
   };
 
-  const { title, artist, thumbnail } = song;
+  const { title, artist, thumbnail } = video;
 
   return (
     <Dialog
@@ -70,7 +70,11 @@ export default function AddSongDialog({
     >
       <DialogContent>
         {thumbnail && (
-          <img src={thumbnail} alt="song thumbnail" style={{ width: "100%" }} />
+          <img
+            src={thumbnail}
+            alt="video thumbnail"
+            style={{ width: "100%" }}
+          />
         )}
         <TextField
           value={artist}
@@ -78,7 +82,7 @@ export default function AddSongDialog({
           name="artist"
           label="Artist"
           fullWidth
-          onChange={handleChangeSong}
+          onChange={handleChangeVideo}
           error={handleError("artist")}
           helperText={handleError("artist") && "Artist field cannot be empty"}
         />
@@ -88,7 +92,7 @@ export default function AddSongDialog({
           name="title"
           label="Title"
           fullWidth
-          onChange={handleChangeSong}
+          onChange={handleChangeVideo}
           error={handleError("title")}
           helperText={handleError("title") && "Title field cannot be empty"}
         />
@@ -97,7 +101,7 @@ export default function AddSongDialog({
         <Button color="inherit" onClick={handleCloseDialog}>
           Cancel
         </Button>
-        <Button color="primary" variant="contained" onClick={handleAddSong}>
+        <Button color="primary" variant="contained" onClick={handleAddVideo}>
           Add
         </Button>
       </DialogActions>

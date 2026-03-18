@@ -11,14 +11,14 @@ import {
 import ReactPlayer from "react-player";
 import { useQuery } from "@apollo/client";
 
-import { SongContext } from "../App";
-import { GET_QUEUED_SONGS } from "../graphql/queries";
+import { VideoContext } from "../App";
+import { GET_QUEUED_VIDEOS } from "../graphql/queries";
 
-export default function SongPlayer() {
-  const { data } = useQuery(GET_QUEUED_SONGS);
-  const { state, dispatch } = useContext(SongContext);
+export default function VideoPlayer() {
+  const { data } = useQuery(GET_QUEUED_VIDEOS);
+  const { state, dispatch } = useContext(VideoContext);
   const [volume, setVolume] = useState(1);
-  const [repeatSong, setRepeatSong] = useState(false);
+  const [repeatVideo, setRepeatVideo] = useState(false);
   const [played, setPlayed] = useState(0);
   const [playedSeconds, setPlayedSeconds] = useState(0);
   const [isUserSeeking, setIsUserSeeking] = useState(false);
@@ -27,20 +27,20 @@ export default function SongPlayer() {
   const reactPlayerRef = useRef();
 
   useEffect(() => {
-    const songIndex = data.queue.findIndex((song) => song.id === state.song.id);
-    setPositionInQueue(songIndex);
-  }, [state.song.id, data.queue]);
+    const videoIndex = data.queue.findIndex((video) => video.id === state.video.id);
+    setPositionInQueue(videoIndex);
+  }, [state.video.id, data.queue]);
 
   useEffect(() => {
-    const nextSong = data.queue[positionInQueue + 1];
-    if (played >= 0.99 && nextSong && repeatSong === false) {
+    const nextVideo = data.queue[positionInQueue + 1];
+    if (played >= 0.99 && nextVideo && repeatVideo === false) {
       setPlayed(0);
-      dispatch({ type: "SET_SONG", payload: { song: nextSong } });
+      dispatch({ type: "SET_VIDEO", payload: { video: nextVideo } });
     }
-  }, [data.queue, played, dispatch, positionInQueue, repeatSong]);
+  }, [data.queue, played, dispatch, positionInQueue, repeatVideo]);
 
   const handleTogglePlay = () => {
-    dispatch(state.isPlaying ? { type: "PAUSE_SONG" } : { type: "PLAY_SONG" });
+    dispatch(state.isPlaying ? { type: "PAUSE_VIDEO" } : { type: "PLAY_VIDEO" });
   };
 
   const handleSliderProgressChange = (_, newValue) => {
@@ -57,7 +57,7 @@ export default function SongPlayer() {
   };
 
   const formatDuration = (seconds) => {
-    const result = state.song.duration / 60;
+    const result = state.video.duration / 60;
     if (result >= 60) {
       if (result >= 600)
         return new Date(seconds * 1000).toISOString().slice(11, 19);
@@ -66,17 +66,17 @@ export default function SongPlayer() {
     return new Date(seconds * 1000).toISOString().slice(14, 19);
   };
 
-  const handlePlayPrevSong = () => {
-    const prevSong = data.queue[positionInQueue - 1];
-    if (prevSong) {
-      dispatch({ type: "SET_SONG", payload: { song: prevSong } });
+  const handlePlayPrevVideo = () => {
+    const prevVideo = data.queue[positionInQueue - 1];
+    if (prevVideo) {
+      dispatch({ type: "SET_VIDEO", payload: { video: prevVideo } });
     }
   };
 
-  const handlePlayNextSong = () => {
-    const nextSong = data.queue[positionInQueue + 1];
-    if (nextSong) {
-      dispatch({ type: "SET_SONG", payload: { song: nextSong } });
+  const handlePlayNextVideo = () => {
+    const nextVideo = data.queue[positionInQueue + 1];
+    if (nextVideo) {
+      dispatch({ type: "SET_VIDEO", payload: { video: nextVideo } });
     }
   };
 
@@ -88,18 +88,18 @@ export default function SongPlayer() {
     setVolume(newValue);
   };
 
-  const handleRepeatSong = () => {
-    setRepeatSong(!repeatSong);
+  const handleRepeatVideo = () => {
+    setRepeatVideo(!repeatVideo);
   };
 
   return (
-    state.song.title &&
-    state.song.artist && (
+    state.video.title &&
+    state.video.artist && (
       <div style={{ display: "flex" }}>
         <div>
           <div style={{ display: "flex", alignItems: "center" }}>
             <div>
-              <Tooltip title={state.song.title}>
+              <Tooltip title={state.video.title}>
                 <Typography variant="body1" component="h3" color="primary">
                   <div
                     style={{
@@ -110,11 +110,11 @@ export default function SongPlayer() {
                       fontWeight: 600,
                     }}
                   >
-                    {state.song.title}
+                    {state.video.title}
                   </div>
                 </Typography>
               </Tooltip>
-              <Tooltip title={state.song.artist}>
+              <Tooltip title={state.video.artist}>
                 <Typography variant="body1" component="h3">
                   <div
                     style={{
@@ -124,26 +124,26 @@ export default function SongPlayer() {
                       textOverflow: "ellipsis",
                     }}
                   >
-                    {state.song.artist}
+                    {state.video.artist}
                   </div>
                 </Typography>
               </Tooltip>
             </div>
             <div style={{ display: "flex", alignItems: "center" }}>
               <div>
-                <IconButton onClick={handlePlayPrevSong}>
+                <IconButton onClick={handlePlayPrevVideo}>
                   <SkipPrevious />
                 </IconButton>
                 <IconButton onClick={handleTogglePlay}>
                   {state.isPlaying ? <Pause /> : <PlayArrow />}
                 </IconButton>
-                <IconButton onClick={handlePlayNextSong}>
+                <IconButton onClick={handlePlayNextVideo}>
                   <SkipNext />
                 </IconButton>
               </div>
-              <Tooltip title="Repeat song">
-                <IconButton onClick={handleRepeatSong}>
-                  <RepeatOne color={repeatSong ? "primary" : "inherit"} />
+              <Tooltip title="Repeat video">
+                <IconButton onClick={handleRepeatVideo}>
+                  <RepeatOne color={repeatVideo ? "primary" : "inherit"} />
                 </IconButton>
               </Tooltip>
               <Tooltip title={toggleVideo ? "Show Video" : "Close Video"}>
@@ -168,7 +168,7 @@ export default function SongPlayer() {
               onChangeCommitted={handleSeekCommitted}
             />
             <Typography variant="caption" component="h6" style={{ marginLeft: 10 }}>
-              {formatDuration(state.song.duration)}
+              {formatDuration(state.video.duration)}
             </Typography>
           </div>
 
@@ -205,8 +205,8 @@ export default function SongPlayer() {
               <ReactPlayer
                 width="100%"
                 height="100%"
-                loop={repeatSong}
-                url={state.song.url}
+                loop={repeatVideo}
+                url={state.video.url}
                 playing={state.isPlaying}
                 volume={volume}
                 controls={state.isVideoExpanded}

@@ -3,13 +3,13 @@ import { Grid, useMediaQuery } from "@mui/material";
 import { useQuery } from "@apollo/client";
 
 import Header from "./components/Header";
-import SongList from "./components/SongList";
-import QueudSongList from "./components/QueuedSongList";
-import songReducer from "./reducer";
-import { GET_QUEUED_SONGS } from "./graphql/queries";
+import VideoList from "./components/VideoList";
+import QueudVideoList from "./components/QueuedVideoList";
+import videoReducer from "./reducer";
+import { GET_QUEUED_VIDEOS } from "./graphql/queries";
 
-export const SongContext = createContext({
-  song: {
+export const VideoContext = createContext({
+  video: {
     artist: "",
     title: "",
     duration: 0,
@@ -23,13 +23,13 @@ export const SongContext = createContext({
 });
 
 function App() {
-  const { data } = useQuery(GET_QUEUED_SONGS);
-  const context = useContext(SongContext);
-  const [state, dispatch] = useReducer(songReducer, context);
+  const { data } = useQuery(GET_QUEUED_VIDEOS);
+  const context = useContext(VideoContext);
+  const [state, dispatch] = useReducer(videoReducer, context);
   const greaterThanMd = useMediaQuery((theme) => theme.breakpoints.up("md"));
 
   return (
-    <SongContext.Provider value={{ state, dispatch }}>
+    <VideoContext.Provider value={{ state, dispatch }}>
       <Header />
       <Grid
         container
@@ -37,14 +37,14 @@ function App() {
       >
         {greaterThanMd && (
           <Grid item md={3}>
-            <QueudSongList queue={data?.queue ?? []} />
+            <QueudVideoList queue={data?.queue ?? []} />
           </Grid>
         )}
         <Grid item xs={12} md={9}>
-          <SongList queue={data?.queue ?? []} />
+          <VideoList queue={data?.queue ?? []} />
         </Grid>
       </Grid>
-    </SongContext.Provider>
+    </VideoContext.Provider>
   );
 }
 

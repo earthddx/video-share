@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
-export const GET_QUEUED_SONGS = gql`
-  query getQueuedSongs {
+export const GET_QUEUED_VIDEOS = gql`
+  query getQueuedVideos {
     queue @client {
       id
       duration

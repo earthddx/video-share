@@ -11,18 +11,18 @@ import {
 } from "@mui/material";
 import { Cancel, ExpandMore, QueueMusic, PlayArrow, VolumeUp, DeleteSweep } from "@mui/icons-material";
 import { useMutation, useApolloClient } from "@apollo/client";
-import { SongContext } from "../App";
+import { VideoContext } from "../App";
 
-import { ADD_OR_REMOVE_SONG_FROM_QUEUE } from "../graphql/mutations";
-import { GET_QUEUED_SONGS } from "../graphql/queries";
+import { ADD_OR_REMOVE_VIDEO_FROM_QUEUE } from "../graphql/mutations";
+import { GET_QUEUED_VIDEOS } from "../graphql/queries";
 
-export default function QueuedSongList({ queue }) {
+export default function QueuedVideoList({ queue }) {
   const [expanded, setExpanded] = useState(true);
   const client = useApolloClient();
 
   const handleClearQueue = (e) => {
     e.stopPropagation();
-    client.cache.writeQuery({ query: GET_QUEUED_SONGS, data: { queue: [] } });
+    client.cache.writeQuery({ query: GET_QUEUED_VIDEOS, data: { queue: [] } });
     localStorage.setItem("queue", JSON.stringify([]));
   };
 
@@ -93,8 +93,8 @@ export default function QueuedSongList({ queue }) {
             "&::-webkit-scrollbar-thumb": { bgcolor: "action.disabled", borderRadius: 2 },
           }}
         >
-          {queue.map((song, i) => (
-            <QueuedSong key={i} song={song} />
+          {queue.map((video, i) => (
+            <QueuedVideo key={i} video={video} />
           ))}
         </Box>
       </Collapse>
@@ -102,27 +102,27 @@ export default function QueuedSongList({ queue }) {
   );
 }
 
-function QueuedSong({ song }) {
-  const { thumbnail, artist, title, duration } = song;
-  const { state, dispatch } = useContext(SongContext);
-  const isCurrentSong = !!state.song.id && song.id === state.song.id;
-  const progress = isCurrentSong && duration > 0 ? state.playedSeconds / duration : 0;
+function QueuedVideo({ video }) {
+  const { thumbnail, artist, title, duration } = video;
+  const { state, dispatch } = useContext(VideoContext);
+  const isCurrentVideo = !!state.video.id && video.id === state.video.id;
+  const progress = isCurrentVideo && duration > 0 ? state.playedSeconds / duration : 0;
 
-  const [addOrRemoveFromQueue] = useMutation(ADD_OR_REMOVE_SONG_FROM_QUEUE, {
+  const [addOrRemoveFromQueue] = useMutation(ADD_OR_REMOVE_VIDEO_FROM_QUEUE, {
     onCompleted: (data) => {
       localStorage.setItem("queue", JSON.stringify(data.addOrRemoveFromQueue));
     },
   });
 
   const handlePlay = () => {
-    dispatch({ type: "SET_SONG", payload: { song } });
-    dispatch({ type: "PLAY_SONG" });
+    dispatch({ type: "SET_VIDEO", payload: { video } });
+    dispatch({ type: "PLAY_VIDEO" });
   };
 
   const handleRemoveFromQueue = (e) => {
     e.stopPropagation();
     addOrRemoveFromQueue({
-      variables: { input: { ...song, __typename: "Song" } },
+      variables: { input: { ...video, __typename: "Video" } },
     });
   };
 
@@ -137,8 +137,8 @@ function QueuedSong({ song }) {
         py: 0.75,
         borderRadius: 1,
         cursor: "pointer",
-        bgcolor: isCurrentSong ? "action.selected" : "transparent",
-        "&:hover": { bgcolor: isCurrentSong ? "action.selected" : "action.hover" },
+        bgcolor: isCurrentVideo ? "action.selected" : "transparent",
+        "&:hover": { bgcolor: isCurrentVideo ? "action.selected" : "action.hover" },
         transition: "background-color 0.15s",
       }}
     >
@@ -147,10 +147,10 @@ function QueuedSong({ song }) {
         <Avatar
           variant="rounded"
           src={thumbnail}
-          alt="song thumbnail"
+          alt="video thumbnail"
           sx={{ width: 40, height: 40, borderRadius: 1 }}
         />
-        {isCurrentSong && (
+        {isCurrentVideo && (
           <Box
             sx={{
               position: "absolute", inset: 0, borderRadius: 1,
@@ -164,7 +164,7 @@ function QueuedSong({ song }) {
           </Box>
         )}
         {/* Progress bar along the bottom edge of thumbnail */}
-        {isCurrentSong && (
+        {isCurrentVideo && (
           <Box
             sx={{
               position: "absolute", bottom: 0, left: 0, right: 0,
@@ -187,9 +187,9 @@ function QueuedSong({ song }) {
       <Box sx={{ flex: 1, overflow: "hidden" }}>
         <Typography
           variant="body2"
-          fontWeight={isCurrentSong ? 600 : 500}
+          fontWeight={isCurrentVideo ? 600 : 500}
           noWrap
-          color={isCurrentSong ? "primary.main" : "text.primary"}
+          color={isCurrentVideo ? "primary.main" : "text.primary"}
         >
           {title}
         </Typography>

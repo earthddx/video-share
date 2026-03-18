@@ -1,7 +1,7 @@
 import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { createClient } from "graphql-ws";
-import { GET_QUEUED_SONGS } from "./queries";
+import { GET_QUEUED_VIDEOS } from "./queries";
 
 const GRAPHQL_ENDPOINT = "wss://enormous-catfish-15.hasura.app/v1/graphql";
 
@@ -20,7 +20,7 @@ const client = new ApolloClient({
   ),
   cache,
   typeDefs: gql`
-    type Song {
+    type Video {
       id: uuid!
       thumbnail: String!
       duration: Float!
@@ -29,7 +29,7 @@ const client = new ApolloClient({
       title: String!
     }
 
-    input SongInput {
+    input VideoInput {
       id: uuid!
       thumbnail: String!
       duration: Float!
@@ -39,27 +39,27 @@ const client = new ApolloClient({
     }
 
     type Query {
-      queue: [Song]!
+      queue: [Video]!
     }
 
     type Mutation {
-      addOrRemoveFromQueue(input: SongInput!): [Song]!
+      addOrRemoveFromQueue(input: VideoInput!): [Video]!
     }
   `,
   resolvers: {
     Mutation: {
       addOrRemoveFromQueue: (_, { input }, { cache }) => {
         const data = cache.readQuery({
-          query: GET_QUEUED_SONGS,
+          query: GET_QUEUED_VIDEOS,
         });
         if (data) {
           const { queue } = data;
-          const isInQueue = queue.some((song) => song.id === input.id);
+          const isInQueue = queue.some((video) => video.id === input.id);
           const newQueue = isInQueue
-            ? queue.filter((song) => song.id !== input.id)
+            ? queue.filter((video) => video.id !== input.id)
             : [...queue, input];
           cache.writeQuery({
-            query: GET_QUEUED_SONGS,
+            query: GET_QUEUED_VIDEOS,
             data: { queue: newQueue },
           });
           return newQueue;
@@ -74,7 +74,7 @@ const itemInQueue = localStorage.getItem("queue");
 const hasQueue = Boolean(itemInQueue);
 
 cache.writeQuery({
-  query: GET_QUEUED_SONGS,
+  query: GET_QUEUED_VIDEOS,
   data: { queue: hasQueue ? JSON.parse(itemInQueue) : [] },
 });
 
