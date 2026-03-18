@@ -11,7 +11,7 @@ export const ADD_SONG = gql`
     $title: String!
     $artist: String!
     $thumbnail: String!
-    $duration: Float!
+    $duration: numeric!
     $url: String!
   ) {
     insert_songs(
