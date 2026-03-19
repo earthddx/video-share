@@ -21,6 +21,20 @@ export default function AddVideo() {
     setPlayable(isPlayable);
   }, [url]);
 
+  const sanitizeUrl = (raw) => {
+    try {
+      const parsed = new URL(raw);
+      if (/youtube\.com/.test(parsed.hostname)) {
+        const v = parsed.searchParams.get("v");
+        return v ? `https://www.youtube.com/watch?v=${v}` : raw;
+      }
+      if (/youtu\.be/.test(parsed.hostname)) {
+        return `https://www.youtube.com/watch?v=${parsed.pathname.slice(1)}`;
+      }
+    } catch (_) {}
+    return raw;
+  };
+
   const handleEditVideo = async ({ player }) => {
     // YouTube — use player API for full metadata
     try {
@@ -79,6 +93,8 @@ export default function AddVideo() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        gap: 8,
+        padding: "12px 16px",
       }}
     >
       <AddVideoDialog
@@ -91,22 +107,24 @@ export default function AddVideo() {
       />
       <TextField
         fullWidth
-        margin="normal"
         size="small"
-        label="Add video URL"
-        variant="filled"
+        label="Paste a video URL"
+        variant="outlined"
         type="url"
-        sx={{ mx: 2, my: 0, maxWidth: 500 }}
-        onChange={(e) => setUrl(e.target.value)}
+        sx={{ maxWidth: 500 }}
+        onChange={(e) => setUrl(sanitizeUrl(e.target.value))}
         value={url}
+        placeholder="YouTube, Vimeo, SoundCloud…"
       />
       <Button
-        variant="outlined"
-        size="large"
+        variant="contained"
+        size="medium"
         onClick={() => setDialog(true)}
         disabled={!playable}
+        startIcon={<Add />}
+        sx={{ whiteSpace: "nowrap", flexShrink: 0 }}
       >
-        <Add />
+        Add
       </Button>
       <ReactPlayer url={url} hidden onReady={handleEditVideo} />
     </div>
