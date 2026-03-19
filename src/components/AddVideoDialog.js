@@ -74,7 +74,7 @@ export default function AddVideoDialog({
       onClose={handleCloseDialog}
       fullWidth
       maxWidth="sm"
-      sx={{ backdropFilter: "blur(6px)" }}
+
       PaperProps={{ sx: { borderRadius: 3 } }}
     >
       <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pb: 1 }}>
