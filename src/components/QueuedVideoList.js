@@ -9,21 +9,71 @@ import {
   Box,
   Tooltip,
 } from "@mui/material";
-import { Cancel, ExpandMore, QueueMusic, PlayArrow, VolumeUp, DeleteSweep } from "@mui/icons-material";
+import { Cancel, ExpandMore, QueueMusic, PlayArrow, VolumeUp, DeleteSweep, DragIndicator, Shuffle } from "@mui/icons-material";
 import { useMutation, useApolloClient } from "@apollo/client";
 import { VideoContext } from "../App";
+
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 import { ADD_OR_REMOVE_VIDEO_FROM_QUEUE } from "../graphql/mutations";
 import { GET_QUEUED_VIDEOS } from "../graphql/queries";
 
 export default function QueuedVideoList({ queue }) {
   const [expanded, setExpanded] = useState(true);
+  const [originalQueue, setOriginalQueue] = useState(null);
   const client = useApolloClient();
+
+  const isShuffled = originalQueue !== null;
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+  );
 
   const handleClearQueue = (e) => {
     e.stopPropagation();
+    setOriginalQueue(null);
     client.cache.writeQuery({ query: GET_QUEUED_VIDEOS, data: { queue: [] } });
     localStorage.setItem("queue", JSON.stringify([]));
+  };
+
+  const handleShuffle = (e) => {
+    e.stopPropagation();
+    if (isShuffled) {
+      client.cache.writeQuery({ query: GET_QUEUED_VIDEOS, data: { queue: originalQueue } });
+      localStorage.setItem("queue", JSON.stringify(originalQueue));
+      setOriginalQueue(null);
+    } else {
+      setOriginalQueue([...queue]);
+      const shuffled = [...queue];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      client.cache.writeQuery({ query: GET_QUEUED_VIDEOS, data: { queue: shuffled } });
+      localStorage.setItem("queue", JSON.stringify(shuffled));
+    }
+  };
+
+  const handleDragEnd = ({ active, over }) => {
+    if (!over || active.id === over.id) return;
+    const oldIndex = queue.findIndex((v) => v.id === active.id);
+    const newIndex = queue.findIndex((v) => v.id === over.id);
+    const reordered = arrayMove(queue, oldIndex, newIndex);
+    client.cache.writeQuery({ query: GET_QUEUED_VIDEOS, data: { queue: reordered } });
+    localStorage.setItem("queue", JSON.stringify(reordered));
   };
 
   return (
@@ -54,6 +104,11 @@ export default function QueuedVideoList({ queue }) {
         />
         {queue.length > 0 && (
           <Box sx={{ ml: "auto", display: "flex", alignItems: "center" }}>
+            <Tooltip title={isShuffled ? "Unshuffle" : "Shuffle"}>
+              <IconButton size="small" onClick={handleShuffle} sx={{ color: isShuffled ? "primary.main" : "text.disabled", "&:hover": { color: isShuffled ? "primary.dark" : "text.primary" } }}>
+                <Shuffle fontSize="small" />
+              </IconButton>
+            </Tooltip>
             <Tooltip title="Clear queue">
               <IconButton size="small" onClick={handleClearQueue} sx={{ color: "text.disabled", "&:hover": { color: "error.main" } }}>
                 <DeleteSweep fontSize="small" />
@@ -78,25 +133,28 @@ export default function QueuedVideoList({ queue }) {
 
       <Collapse in={expanded && queue.length > 0} timeout="auto" unmountOnExit>
         <Divider sx={{ mb: 1 }} />
-        {/* Scrollable list */}
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 0.5,
-            maxHeight: 420,
-            overflowY: "auto",
-            overflowX: "hidden",
-            pr: 0.5,
-            "&::-webkit-scrollbar": { width: 4 },
-            "&::-webkit-scrollbar-track": { bgcolor: "transparent" },
-            "&::-webkit-scrollbar-thumb": { bgcolor: "action.disabled", borderRadius: 2 },
-          }}
-        >
-          {queue.map((video, i) => (
-            <QueuedVideo key={i} video={video} />
-          ))}
-        </Box>
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={queue.map((v) => v.id)} strategy={verticalListSortingStrategy}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 0.5,
+                maxHeight: 420,
+                overflowY: "auto",
+                overflowX: "hidden",
+                pr: 0.5,
+                "&::-webkit-scrollbar": { width: 4 },
+                "&::-webkit-scrollbar-track": { bgcolor: "transparent" },
+                "&::-webkit-scrollbar-thumb": { bgcolor: "action.disabled", borderRadius: 2 },
+              }}
+            >
+              {queue.map((video) => (
+                <QueuedVideo key={video.id} video={video} />
+              ))}
+            </Box>
+          </SortableContext>
+        </DndContext>
       </Collapse>
     </Box>
   );
@@ -107,6 +165,15 @@ function QueuedVideo({ video }) {
   const { state, dispatch } = useContext(VideoContext);
   const isCurrentVideo = !!state.video.id && video.id === state.video.id;
   const progress = isCurrentVideo && duration > 0 ? state.playedSeconds / duration : 0;
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: video.id });
 
   const [addOrRemoveFromQueue] = useMutation(ADD_OR_REMOVE_VIDEO_FROM_QUEUE, {
     onCompleted: (data) => {
@@ -128,6 +195,7 @@ function QueuedVideo({ video }) {
 
   return (
     <Box
+      ref={setNodeRef}
       onClick={handlePlay}
       sx={{
         display: "flex",
@@ -139,15 +207,38 @@ function QueuedVideo({ video }) {
         cursor: "pointer",
         bgcolor: isCurrentVideo ? "action.selected" : "transparent",
         "&:hover": { bgcolor: isCurrentVideo ? "action.selected" : "action.hover" },
-        transition: "background-color 0.15s",
+        transition: isDragging ? "none" : "background-color 0.15s",
+        transform: CSS.Transform.toString(transform),
+        ...(transition && { transition }),
+        opacity: isDragging ? 0.5 : 1,
+        zIndex: isDragging ? 1 : "auto",
       }}
     >
+      {/* Drag handle */}
+      <Box
+        {...attributes}
+        {...listeners}
+        onClick={(e) => e.stopPropagation()}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          cursor: "grab",
+          color: "text.disabled",
+          flexShrink: 0,
+          "&:hover": { color: "text.secondary" },
+          "&:active": { cursor: "grabbing" },
+        }}
+      >
+        <DragIndicator sx={{ fontSize: 16 }} />
+      </Box>
+
       {/* Thumbnail with overlay + progress bar */}
       <Box sx={{ position: "relative", flexShrink: 0, width: 40, height: 40 }}>
         <Avatar
           variant="rounded"
           src={thumbnail}
           alt="video thumbnail"
+          slotProps={{ img: { loading: "lazy" } }}
           sx={{ width: 40, height: 40, borderRadius: 1 }}
         />
         {isCurrentVideo && (
