@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Grid,
   CircularProgress,
@@ -8,6 +8,8 @@ import {
   DialogContentText,
   DialogActions,
   Button,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { useSubscription, useMutation } from "@apollo/client";
 
@@ -20,6 +22,45 @@ export default function VideoList({ queue }) {
   const { data, loading, error } = useSubscription(GET_VIDEOS);
   const [deleteVideo] = useMutation(DELETE_VIDEO);
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
+  const [toast, setToast] = useState({ open: false, message: "", severity: "info" });
+  const prevVideosRef = useRef(null);
+
+  useEffect(() => {
+    if (!data?.videos) return;
+
+    // Skip the initial load — don't toast for existing videos
+    if (prevVideosRef.current === null) {
+      prevVideosRef.current = data.videos;
+      return;
+    }
+
+    const prev = prevVideosRef.current;
+    const curr = data.videos;
+    const prevIds = new Set(prev.map((v) => v.id));
+    const currIds = new Set(curr.map((v) => v.id));
+
+    const added = curr.filter((v) => !prevIds.has(v.id));
+    const removed = prev.filter((v) => !currIds.has(v.id));
+
+    if (added.length > 0) {
+      setToast({
+        open: true,
+        message: `"${added[0].title}" was added`,
+        severity: "success",
+      });
+    } else if (removed.length > 0) {
+      // Only notify if not triggered by the local user's delete action
+      if (removed[0].id !== pendingDeleteId) {
+        setToast({
+          open: true,
+          message: `"${removed[0].title}" was removed`,
+          severity: "info",
+        });
+      }
+    }
+
+    prevVideosRef.current = data.videos;
+  }, [data?.videos]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) {
     return (
@@ -51,7 +92,7 @@ export default function VideoList({ queue }) {
       <Grid container spacing={3}>
         {data.videos.map((video) => (
           <Grid item xs={12} sm={6} md={4} key={video.id}>
-            <Video video={video} handleDeleteVideo={handleDeleteVideo} queue={queue} />
+            <Video video={video} handleDeleteVideo={handleDeleteVideo} queue={queue} allVideos={data.videos} />
           </Grid>
         ))}
       </Grid>
@@ -70,6 +111,22 @@ export default function VideoList({ queue }) {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={toast.open}
+        autoHideDuration={4000}
+        onClose={() => setToast((t) => ({ ...t, open: false }))}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setToast((t) => ({ ...t, open: false }))}
+          severity={toast.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {toast.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 }
