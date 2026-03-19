@@ -1,22 +1,13 @@
 const videoReducer = (state, action) => {
   switch (action.type) {
     case "PLAY_VIDEO": {
-      return {
-        ...state,
-        isPlaying: true,
-      };
+      return { ...state, isPlaying: true };
     }
     case "PAUSE_VIDEO": {
-      return {
-        ...state,
-        isPlaying: false,
-      };
+      return { ...state, isPlaying: false };
     }
     case "SET_VIDEO": {
-      return {
-        ...state,
-        video: action.payload.video,
-      };
+      return { ...state, video: action.payload.video };
     }
     case "SET_PLAYED_SECONDS": {
       return { ...state, playedSeconds: action.payload.playedSeconds };
@@ -26,6 +17,15 @@ const videoReducer = (state, action) => {
     }
     case "COLLAPSE_VIDEO": {
       return { ...state, isVideoExpanded: false };
+    }
+    case "SEEK_TO": {
+      return { ...state, seekTo: action.payload.fraction };
+    }
+    case "SEEK_TO_DONE": {
+      return { ...state, seekTo: null };
+    }
+    case "SET_VOLUME": {
+      return { ...state, volume: action.payload.volume };
     }
     default:
       return state;
