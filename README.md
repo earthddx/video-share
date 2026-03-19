@@ -4,6 +4,8 @@ A real-time collaborative video queue — paste a link, everyone sees it instant
 
 **[Live demo →](https://earthddx.github.io/video-share)**
 
+> Originally written in 2020 and left untouched for ~5 years. Resurrected, modernised, and brought back to life in 2025.
+
 ---
 
 ## Features
