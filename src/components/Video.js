@@ -211,9 +211,37 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
                 />
               </Suspense>
 
+              {/* Modal header — close button */}
+              {state.isVideoExpanded && (
+                <Box
+                  onClick={(e) => e.stopPropagation()}
+                  sx={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    px: 1,
+                    pt: 1,
+                    background: "transparent",
+                    zIndex: 1,
+                  }}
+                >
+                  <Tooltip title="Close">
+                    <IconButton
+                      onClick={() => dispatch({ type: "COLLAPSE_VIDEO" })}
+                    >
+                      <Close sx={{ color: "white" }} />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              )}
+
               {/* Modal controls */}
               {state.isVideoExpanded && (
                 <Box
+                  onClick={(e) => e.stopPropagation()}
                   sx={{
                     position: "absolute",
                     bottom: 0,
@@ -304,14 +332,6 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
                       }}
                     />
 
-                    <Tooltip title="Close">
-                      <IconButton
-                        onClick={() => dispatch({ type: "COLLAPSE_VIDEO" })}
-                        sx={{ ml: 1 }}
-                      >
-                        <Close sx={{ color: "white" }} />
-                      </IconButton>
-                    </Tooltip>
                   </Box>
                 </Box>
               )}

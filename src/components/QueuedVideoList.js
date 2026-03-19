@@ -8,6 +8,8 @@ import {
   Divider,
   Box,
   Tooltip,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { Cancel, ExpandMore, QueueMusic, PlayArrow, VolumeUp, DeleteSweep, DragIndicator, Shuffle } from "@mui/icons-material";
 import { useMutation, useApolloClient } from "@apollo/client";
@@ -34,6 +36,7 @@ import { GET_QUEUED_VIDEOS } from "../graphql/queries";
 export default function QueuedVideoList({ queue }) {
   const [expanded, setExpanded] = useState(true);
   const [originalQueue, setOriginalQueue] = useState(null);
+  const isMobile = useMediaQuery(useTheme().breakpoints.down("sm"));
   const client = useApolloClient();
 
   const isShuffled = originalQueue !== null;
@@ -85,10 +88,10 @@ export default function QueuedVideoList({ queue }) {
           alignItems: "center",
           gap: 1,
           mb: 1,
-          cursor: queue.length > 0 ? "pointer" : "default",
+          cursor: !isMobile && queue.length > 0 ? "pointer" : "default",
           userSelect: "none",
         }}
-        onClick={() => queue.length > 0 && setExpanded((v) => !v)}
+        onClick={() => !isMobile && queue.length > 0 && setExpanded((v) => !v)}
       >
         <QueueMusic sx={{ color: "text.secondary", fontSize: 20 }} />
         <Typography
@@ -114,24 +117,26 @@ export default function QueuedVideoList({ queue }) {
                 <DeleteSweep fontSize="small" />
               </IconButton>
             </Tooltip>
-            <IconButton
-              size="small"
-              aria-expanded={expanded}
-              sx={{
-                transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
-                transition: (theme) =>
-                  theme.transitions.create("transform", {
-                    duration: theme.transitions.duration.shortest,
-                  }),
-              }}
-            >
-              <ExpandMore fontSize="small" />
-            </IconButton>
+            {!isMobile && (
+              <IconButton
+                size="small"
+                aria-expanded={expanded}
+                sx={{
+                  transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
+                  transition: (theme) =>
+                    theme.transitions.create("transform", {
+                      duration: theme.transitions.duration.shortest,
+                    }),
+                }}
+              >
+                <ExpandMore fontSize="small" />
+              </IconButton>
+            )}
           </Box>
         )}
       </Box>
 
-      <Collapse in={expanded && queue.length > 0} timeout="auto" unmountOnExit>
+      <Collapse in={(isMobile || expanded) && queue.length > 0} timeout="auto" unmountOnExit>
         <Divider sx={{ mb: 1 }} />
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext items={queue.map((v) => v.id)} strategy={verticalListSortingStrategy}>
@@ -165,6 +170,7 @@ function QueuedVideo({ video }) {
   const { state, dispatch } = useContext(VideoContext);
   const isCurrentVideo = !!state.video.id && video.id === state.video.id;
   const progress = isCurrentVideo && duration > 0 ? state.playedSeconds / duration : 0;
+  const [hovered, setHovered] = useState(false);
 
   const {
     attributes,
@@ -197,6 +203,8 @@ function QueuedVideo({ video }) {
     <Box
       ref={setNodeRef}
       onClick={handlePlay}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       sx={{
         display: "flex",
         alignItems: "center",
@@ -291,7 +299,13 @@ function QueuedVideo({ video }) {
       <IconButton
         size="small"
         onClick={handleRemoveFromQueue}
-        sx={{ color: "text.disabled", flexShrink: 0, "&:hover": { color: "error.main" } }}
+        sx={{
+          color: "text.disabled",
+          flexShrink: 0,
+          opacity: { xs: 1, sm: hovered ? 1 : 0 },
+          "&:hover": { color: "error.main" },
+          transition: "opacity 0.15s",
+        }}
       >
         <Cancel fontSize="small" />
       </IconButton>
