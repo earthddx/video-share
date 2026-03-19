@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useRef, Suspense } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import {
   CardMedia,
   Typography,
@@ -26,6 +26,9 @@ import ReactPlayer from "react-player";
 import { ADD_OR_REMOVE_VIDEO_FROM_QUEUE } from "../graphql/mutations";
 import { VideoContext } from "../App";
 
+const MODAL_CONTROLS_HEIGHT = 80;
+const THROTTLE_UPDATE_INTERVAL = 5000; // ms
+
 export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
   const { artist, title, thumbnail } = video;
   const { state, dispatch } = useContext(VideoContext);
@@ -38,13 +41,15 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
   const [playedSeconds, setPlayedSeconds] = useState(0);
   const [isUserSeeking, setIsUserSeeking] = useState(false);
   const volume = state.volume ?? 1;
-  const setVolume = (v) => dispatch({ type: "SET_VOLUME", payload: { volume: v } });
+  const setVolume = (v) =>
+    dispatch({ type: "SET_VOLUME", payload: { volume: v } });
   const [repeatVideo, setRepeatVideo] = useState(false);
   const [positionInQueue, setPositionInQueue] = useState(0);
   const reactPlayerRef = useRef();
   // Captured once at mount — used to seek-restore after page refresh
   const initialSecondsRef = useRef(isCurrentVideo ? state.playedSeconds : 0);
   const hasRestoredSeek = useRef(false);
+  const lastDispatchedSecondsRef = useRef(0);
 
   const [addOrRemoveFromQueue] = useMutation(ADD_OR_REMOVE_VIDEO_FROM_QUEUE, {
     onCompleted: (data) => {
@@ -77,7 +82,16 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
         dispatch({ type: "SET_VIDEO", payload: { video: nextInList } });
       }
     }
-  }, [played, positionInQueue, repeatVideo, isCurrentVideo, dispatch, queue, allVideos, video.id]);
+  }, [
+    played,
+    positionInQueue,
+    repeatVideo,
+    isCurrentVideo,
+    dispatch,
+    queue,
+    allVideos,
+    video.id,
+  ]);
 
   // Seek triggered from mini player
   useEffect(() => {
@@ -137,7 +151,12 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
           borderRadius: 2,
           overflow: "hidden",
           transition: "background-color 0.2s",
-          "&:hover": { bgcolor: (theme) => theme.palette.mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)" },
+          "&:hover": {
+            bgcolor: (theme) =>
+              theme.palette.mode === "dark"
+                ? "rgba(255,255,255,0.06)"
+                : "rgba(0,0,0,0.05)",
+          },
         }}
       >
         {/* 16:9 video area */}
@@ -181,35 +200,48 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
                     }
               }
             >
-              <Suspense fallback={null}>
-                <ReactPlayer
-                  ref={reactPlayerRef}
-                  url={video.url}
-                  playing={state.isPlaying}
-                  volume={volume}
-                  loop={repeatVideo}
-                  width="100%"
-                  height={state.isVideoExpanded ? "calc(100% - 80px)" : "100%"}
-                  controls={false}
-                  style={{ pointerEvents: "none" }}
-                  onReady={() => {
-                    if (!hasRestoredSeek.current && initialSecondsRef.current > 0) {
-                      reactPlayerRef.current?.seekTo(initialSecondsRef.current, "seconds");
-                      hasRestoredSeek.current = true;
-                    }
-                  }}
-                  onProgress={({ played: p, playedSeconds: ps }) => {
-                    if (!isUserSeeking) {
-                      setPlayed(p);
-                      setPlayedSeconds(ps);
+              <ReactPlayer
+                ref={reactPlayerRef}
+                url={video.url}
+                playing={state.isPlaying}
+                volume={volume}
+                loop={repeatVideo}
+                width="100%"
+                height={
+                  state.isVideoExpanded
+                    ? `calc(100% - ${MODAL_CONTROLS_HEIGHT}px)`
+                    : "100%"
+                }
+                style={{ pointerEvents: "none" }}
+                onReady={() => {
+                  if (
+                    !hasRestoredSeek.current &&
+                    initialSecondsRef.current > 0
+                  ) {
+                    reactPlayerRef.current?.seekTo(
+                      initialSecondsRef.current,
+                      "seconds",
+                    );
+                    hasRestoredSeek.current = true;
+                  }
+                }}
+                onProgress={({ played: p, playedSeconds: ps }) => {
+                  if (!isUserSeeking) {
+                    setPlayed(p);
+                    setPlayedSeconds(ps);
+                    if (
+                      ps - lastDispatchedSecondsRef.current >=
+                      THROTTLE_UPDATE_INTERVAL / 1000
+                    ) {
+                      lastDispatchedSecondsRef.current = ps;
                       dispatch({
                         type: "SET_PLAYED_SECONDS",
                         payload: { playedSeconds: ps },
                       });
                     }
-                  }}
-                />
-              </Suspense>
+                  }
+                }}
+              />
 
               {/* Modal header — close button */}
               {state.isVideoExpanded && (
@@ -331,7 +363,6 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
                         "& .MuiSlider-thumb": { width: 12, height: 12 },
                       }}
                     />
-
                   </Box>
                 </Box>
               )}

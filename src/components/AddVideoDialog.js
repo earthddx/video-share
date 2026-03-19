@@ -77,7 +77,7 @@ export default function AddVideoDialog({
 
       PaperProps={{ sx: { borderRadius: 3 } }}
     >
-      <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pb: 1 }}>
+      <DialogTitle component="div" sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pb: 1 }}>
         <Typography variant="h6" fontWeight={600}>Add to library</Typography>
         <IconButton size="small" onClick={handleCloseDialog} sx={{ color: "text.secondary" }}>
           <Close fontSize="small" />
