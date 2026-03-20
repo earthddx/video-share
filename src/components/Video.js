@@ -6,6 +6,7 @@ import {
   Tooltip,
   Box,
   Slider,
+  Snackbar,
 } from "@mui/material";
 import {
   PlayArrow,
@@ -19,6 +20,7 @@ import {
   SkipNext,
   RepeatOne,
   VolumeUp,
+  Share,
 } from "@mui/icons-material";
 import { useMutation } from "@apollo/client";
 import ReactPlayer from "react-player";
@@ -44,6 +46,12 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
   const setVolume = (v) =>
     dispatch({ type: "SET_VOLUME", payload: { volume: v } });
   const [repeatVideo, setRepeatVideo] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(video.url).then(() => setCopied(true));
+  };
   const [positionInQueue, setPositionInQueue] = useState(0);
   const reactPlayerRef = useRef();
   // Captured once at mount — used to seek-restore after page refresh
@@ -625,8 +633,29 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
               </IconButton>
             </span>
           </Tooltip>
+          <Tooltip title="Copy link">
+            <IconButton
+              size="small"
+              onClick={handleShare}
+              sx={{
+                mt: "-2px",
+                ml: 0.5,
+                opacity: hovered ? 1 : 0,
+                transition: "opacity 0.2s",
+              }}
+            >
+              <Share sx={{ fontSize: 16, color: "grey.400" }} />
+            </IconButton>
+          </Tooltip>
         </Box>
       </Box>
+      <Snackbar
+        open={copied}
+        autoHideDuration={2000}
+        onClose={() => setCopied(false)}
+        message="Link copied to clipboard"
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      />
     </>
   );
 }
