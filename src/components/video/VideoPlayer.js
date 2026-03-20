@@ -11,8 +11,8 @@ import {
 import ReactPlayer from "react-player";
 import { useQuery } from "@apollo/client";
 
-import { VideoContext } from "../App";
-import { GET_QUEUED_VIDEOS } from "../graphql/queries";
+import { VideoContext } from "../../App";
+import { GET_QUEUED_VIDEOS } from "../../graphql/queries";
 
 export default function VideoPlayer() {
   const { data } = useQuery(GET_QUEUED_VIDEOS);

@@ -1,5 +1,5 @@
 import { IconButton, Tooltip, Box } from "@mui/material";
-import MarqueeText from "./MarqueeText";
+import MarqueeText from "../MarqueeText";
 import { Queue, Check, Share } from "@mui/icons-material";
 
 export default function VideoInfoRow({

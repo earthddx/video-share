@@ -3,7 +3,7 @@ import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { createClient } from "graphql-ws";
 import { GET_QUEUED_VIDEOS } from "./queries";
 
-const GRAPHQL_ENDPOINT = "wss://enormous-catfish-15.hasura.app/v1/graphql";
+const GRAPHQL_ENDPOINT = process.env.REACT_APP_GRAPHQL_ENDPOINT;
 
 const cache = new InMemoryCache();
 

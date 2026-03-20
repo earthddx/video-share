@@ -1,20 +1,33 @@
 import { useContext } from "react";
-import { Box, IconButton, Typography, Avatar, Slider, Tooltip } from "@mui/material";
-import MarqueeText from "./MarqueeText";
-import { PlayArrow, Pause, SkipPrevious, SkipNext, VolumeUp, VolumeOff } from "@mui/icons-material";
-import { VideoContext } from "../App";
-
-function formatDuration(seconds, totalDuration) {
-  const ref = totalDuration || 0;
-  const mins = ref / 60;
-  if (mins >= 600) return new Date(seconds * 1000).toISOString().slice(11, 19);
-  if (mins >= 60)  return new Date(seconds * 1000).toISOString().slice(12, 19);
-  return new Date(seconds * 1000).toISOString().slice(14, 19);
-}
+import {
+  Box,
+  IconButton,
+  Typography,
+  Avatar,
+  Slider,
+  Tooltip,
+} from "@mui/material";
+import MarqueeText from "../MarqueeText";
+import {
+  PlayArrow,
+  Pause,
+  SkipPrevious,
+  SkipNext,
+  VolumeUp,
+  VolumeOff,
+} from "@mui/icons-material";
+import { VideoContext } from "../../App";
+import { formatDuration } from "../../helpers/formatDuration";
 
 export default function MiniPlayer({ queue }) {
   const { state, dispatch } = useContext(VideoContext);
-  const { video, isPlaying, playedSeconds, isVideoExpanded, volume = 1 } = state;
+  const {
+    video,
+    isPlaying,
+    playedSeconds,
+    isVideoExpanded,
+    volume = 1,
+  } = state;
 
   if (!video.id || isVideoExpanded) return null;
 
@@ -96,10 +109,20 @@ export default function MiniPlayer({ queue }) {
               "&:hover .scroll-title": { textDecoration: "underline" },
             }}
           >
-            <MarqueeText always typographyProps={{ variant: "body2", fontWeight: 600, className: "scroll-title" }}>
+            <MarqueeText
+              always
+              typographyProps={{
+                variant: "body2",
+                fontWeight: 600,
+                className: "scroll-title",
+              }}
+            >
               {video.title}
             </MarqueeText>
-            <MarqueeText always typographyProps={{ variant: "caption", color: "text.secondary" }}>
+            <MarqueeText
+              always
+              typographyProps={{ variant: "caption", color: "text.secondary" }}
+            >
               {video.artist}
             </MarqueeText>
           </Box>
@@ -115,7 +138,9 @@ export default function MiniPlayer({ queue }) {
 
         <IconButton
           onClick={() =>
-            dispatch(isPlaying ? { type: "PAUSE_VIDEO" } : { type: "PLAY_VIDEO" })
+            dispatch(
+              isPlaying ? { type: "PAUSE_VIDEO" } : { type: "PLAY_VIDEO" },
+            )
           }
         >
           {isPlaying ? <Pause /> : <PlayArrow />}
@@ -129,12 +154,28 @@ export default function MiniPlayer({ queue }) {
           </span>
         </Tooltip>
 
-        <Box sx={{ display: { xs: "none", sm: "flex" }, alignItems: "center", gap: 0.5, ml: 0.5 }}>
+        <Box
+          sx={{
+            display: { xs: "none", sm: "flex" },
+            alignItems: "center",
+            gap: 0.5,
+            ml: 0.5,
+          }}
+        >
           <IconButton
             size="small"
-            onClick={() => dispatch({ type: "SET_VOLUME", payload: { volume: volume > 0 ? 0 : 1 } })}
+            onClick={() =>
+              dispatch({
+                type: "SET_VOLUME",
+                payload: { volume: volume > 0 ? 0 : 1 },
+              })
+            }
           >
-            {volume === 0 ? <VolumeOff fontSize="small" /> : <VolumeUp fontSize="small" />}
+            {volume === 0 ? (
+              <VolumeOff fontSize="small" />
+            ) : (
+              <VolumeUp fontSize="small" />
+            )}
           </IconButton>
           <Slider
             value={volume}
@@ -142,15 +183,23 @@ export default function MiniPlayer({ queue }) {
             max={1}
             step={0.01}
             size="small"
-            onChange={(_, v) => dispatch({ type: "SET_VOLUME", payload: { volume: v } })}
+            onChange={(_, v) =>
+              dispatch({ type: "SET_VOLUME", payload: { volume: v } })
+            }
             sx={{ width: 72, "& .MuiSlider-thumb": { width: 10, height: 10 } }}
           />
         </Box>
       </Box>
 
       {/* Progress row with times */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1, px: 1.5, pb: 1 }}>
-        <Typography variant="caption" color="text.secondary" sx={{ minWidth: 34, textAlign: "right", flexShrink: 0 }}>
+      <Box
+        sx={{ display: "flex", alignItems: "center", gap: 1, px: 1.5, pb: 1 }}
+      >
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ minWidth: 34, textAlign: "right", flexShrink: 0 }}
+        >
           {formatDuration(playedSeconds, video.duration)}
         </Typography>
 
@@ -173,7 +222,11 @@ export default function MiniPlayer({ queue }) {
           }}
         />
 
-        <Typography variant="caption" color="text.secondary" sx={{ minWidth: 34, flexShrink: 0 }}>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ minWidth: 34, flexShrink: 0 }}
+        >
           {formatDuration(video.duration, video.duration)}
         </Typography>
       </Box>

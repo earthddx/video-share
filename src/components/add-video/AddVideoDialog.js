@@ -15,7 +15,7 @@ import {
 import { Close, MusicVideo } from "@mui/icons-material";
 import { useMutation } from "@apollo/client";
 
-import { ADD_VIDEO } from "../graphql/mutations";
+import { ADD_VIDEO } from "../../graphql/mutations";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -74,12 +74,25 @@ export default function AddVideoDialog({
       onClose={handleCloseDialog}
       fullWidth
       maxWidth="sm"
-
       PaperProps={{ sx: { borderRadius: 3 } }}
     >
-      <DialogTitle component="div" sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pb: 1 }}>
-        <Typography variant="h6" fontWeight={600}>Add to library</Typography>
-        <IconButton size="small" onClick={handleCloseDialog} sx={{ color: "text.secondary" }}>
+      <DialogTitle
+        component="div"
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          pb: 1,
+        }}
+      >
+        <Typography variant="h6" fontWeight={600}>
+          Add to library
+        </Typography>
+        <IconButton
+          size="small"
+          onClick={handleCloseDialog}
+          sx={{ color: "text.secondary" }}
+        >
           <Close fontSize="small" />
         </IconButton>
       </DialogTitle>
@@ -105,7 +118,12 @@ export default function AddVideoDialog({
             <img
               src={thumbnail}
               alt="video thumbnail"
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                display: "block",
+              }}
             />
           ) : (
             <MusicVideo sx={{ fontSize: 48, color: "text.disabled" }} />
@@ -139,10 +157,20 @@ export default function AddVideoDialog({
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 2.5, pt: 1.5, gap: 1 }}>
-        <Button fullWidth variant="outlined" color="inherit" onClick={handleCloseDialog}>
+        <Button
+          fullWidth
+          variant="outlined"
+          color="inherit"
+          onClick={handleCloseDialog}
+        >
           Cancel
         </Button>
-        <Button fullWidth variant="contained" color="primary" onClick={handleAddVideo}>
+        <Button
+          fullWidth
+          variant="contained"
+          color="primary"
+          onClick={handleAddVideo}
+        >
           Add video
         </Button>
       </DialogActions>

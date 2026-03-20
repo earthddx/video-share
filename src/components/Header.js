@@ -9,9 +9,14 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import { YouTube, InfoOutlined, LightMode, DarkMode } from "@mui/icons-material";
+import {
+  YouTube,
+  InfoOutlined,
+  LightMode,
+  DarkMode,
+} from "@mui/icons-material";
 
-import AddVideo from "./AddVideo";
+import AddVideo from "./add-video";
 import AboutDialog from "./AboutDialog";
 import { ThemeContext } from "../App";
 
@@ -27,7 +32,11 @@ export default function Header() {
           <Grid item md={2}>
             <Toolbar>
               <YouTube sx={{ fontSize: 36 }} color="primary" />
-              <Typography variant="h6" component="h1" sx={{ ml: 1, fontWeight: "light" }}>
+              <Typography
+                variant="h6"
+                component="h1"
+                sx={{ ml: 1, fontWeight: "light" }}
+              >
                 Video Share
               </Typography>
             </Toolbar>
@@ -44,7 +53,12 @@ export default function Header() {
           item
           xs={2}
           md={2}
-          sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 0.5 }}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 0.5,
+          }}
         >
           {greaterThanMd && (
             <Button
@@ -57,7 +71,11 @@ export default function Header() {
           )}
           <Tooltip title={mode === "dark" ? "Light mode" : "Dark mode"}>
             <IconButton color="inherit" onClick={toggleTheme} size="small">
-              {mode === "dark" ? <LightMode fontSize="small" /> : <DarkMode fontSize="small" />}
+              {mode === "dark" ? (
+                <LightMode fontSize="small" />
+              ) : (
+                <DarkMode fontSize="small" />
+              )}
             </IconButton>
           </Tooltip>
         </Grid>

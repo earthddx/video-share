@@ -13,11 +13,11 @@ import {
 } from "@mui/material";
 import { useSubscription, useMutation, useApolloClient } from "@apollo/client";
 
-import { GET_VIDEOS } from "../graphql/subscriptions";
-import { DELETE_VIDEO } from "../graphql/mutations";
-import { GET_QUEUED_VIDEOS } from "../graphql/queries";
+import { GET_VIDEOS } from "../../graphql/subscriptions";
+import { DELETE_VIDEO } from "../../graphql/mutations";
+import { GET_QUEUED_VIDEOS } from "../../graphql/queries";
 
-import Video from "./Video";
+import Video from ".";
 
 export default function VideoList({ queue }) {
   const { data, loading, error } = useSubscription(GET_VIDEOS);

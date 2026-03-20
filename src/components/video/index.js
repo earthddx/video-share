@@ -15,8 +15,8 @@ import {
 import { useMutation } from "@apollo/client";
 import ReactPlayer from "react-player";
 
-import { ADD_OR_REMOVE_VIDEO_FROM_QUEUE } from "../graphql/mutations";
-import { VideoContext } from "../App";
+import { ADD_OR_REMOVE_VIDEO_FROM_QUEUE } from "../../graphql/mutations";
+import { VideoContext } from "../../App";
 import PlayerControls from "./PlayerControls";
 import VideoInfoRow from "./VideoInfoRow";
 
