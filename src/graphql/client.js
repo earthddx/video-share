@@ -16,6 +16,13 @@ const client = new ApolloClient({
           "x-hasura-role": "public",
         },
       },
+      shouldRetry: () => true,
+      retryAttempts: 5,
+      retryWait: async (retries) => {
+        await new Promise((resolve) =>
+          setTimeout(resolve, 1000 * 2 ** retries)
+        );
+      },
     })
   ),
   cache,
