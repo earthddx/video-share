@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import {
   Box,
   IconButton,
@@ -24,10 +24,17 @@ export default function MiniPlayer({ queue }) {
   const {
     video,
     isPlaying,
-    playedSeconds,
     isVideoExpanded,
     volume = 1,
   } = state;
+
+  const [playedSeconds, setPlayedSeconds] = useState(state.playedSeconds);
+
+  useEffect(() => {
+    const handler = (e) => setPlayedSeconds(e.detail.playedSeconds);
+    window.addEventListener("playerProgress", handler);
+    return () => window.removeEventListener("playerProgress", handler);
+  }, []);
 
   if (!video.id || isVideoExpanded) return null;
 

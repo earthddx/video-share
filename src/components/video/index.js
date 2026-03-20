@@ -20,7 +20,6 @@ import VideoInfoRow from "./VideoInfoRow";
 import { VideoContext } from "../../store/VideoContext";
 
 const MODAL_CONTROLS_HEIGHT = 80;
-const THROTTLE_UPDATE_INTERVAL = 5000; // ms
 
 export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
   const { artist, title, thumbnail } = video;
@@ -227,7 +226,10 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
                   if (!isUserSeeking) {
                     setPlayed(p);
                     setPlayedSeconds(ps);
-                    if (ps - lastDispatchedSecondsRef.current >= THROTTLE_UPDATE_INTERVAL / 1000) {
+                    window.dispatchEvent(
+                      new CustomEvent("playerProgress", { detail: { playedSeconds: ps } })
+                    );
+                    if (ps - lastDispatchedSecondsRef.current >= 5) {
                       lastDispatchedSecondsRef.current = ps;
                       dispatch({ type: "SET_PLAYED_SECONDS", payload: { playedSeconds: ps } });
                     }
