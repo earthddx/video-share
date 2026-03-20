@@ -1,32 +1,24 @@
 import { useState, useEffect, useContext, useRef } from "react";
 import {
   CardMedia,
-  Typography,
   IconButton,
   Tooltip,
   Box,
-  Slider,
   Snackbar,
 } from "@mui/material";
 import {
   PlayArrow,
-  Queue,
   Cancel,
-  Pause,
-  Check,
   Fullscreen,
   Close,
-  SkipPrevious,
-  SkipNext,
-  RepeatOne,
-  VolumeUp,
-  Share,
 } from "@mui/icons-material";
 import { useMutation } from "@apollo/client";
 import ReactPlayer from "react-player";
 
 import { ADD_OR_REMOVE_VIDEO_FROM_QUEUE } from "../graphql/mutations";
 import { VideoContext } from "../App";
+import PlayerControls from "./PlayerControls";
+import VideoInfoRow from "./VideoInfoRow";
 
 const MODAL_CONTROLS_HEIGHT = 80;
 const THROTTLE_UPDATE_INTERVAL = 5000; // ms
@@ -42,19 +34,14 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
   const [played, setPlayed] = useState(0);
   const [playedSeconds, setPlayedSeconds] = useState(0);
   const [isUserSeeking, setIsUserSeeking] = useState(false);
-  const volume = state.volume ?? 1;
-  const setVolume = (v) =>
-    dispatch({ type: "SET_VOLUME", payload: { volume: v } });
   const [repeatVideo, setRepeatVideo] = useState(false);
   const [copied, setCopied] = useState(false);
-
-  const handleShare = (e) => {
-    e.stopPropagation();
-    navigator.clipboard.writeText(video.url).then(() => setCopied(true));
-  };
   const [positionInQueue, setPositionInQueue] = useState(0);
+
+  const volume = state.volume ?? 1;
+  const setVolume = (v) => dispatch({ type: "SET_VOLUME", payload: { volume: v } });
+
   const reactPlayerRef = useRef();
-  // Captured once at mount — used to seek-restore after page refresh
   const initialSecondsRef = useRef(isCurrentVideo ? state.playedSeconds : 0);
   const hasRestoredSeek = useRef(false);
   const lastDispatchedSecondsRef = useRef(0);
@@ -90,16 +77,7 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
         dispatch({ type: "SET_VIDEO", payload: { video: nextInList } });
       }
     }
-  }, [
-    played,
-    positionInQueue,
-    repeatVideo,
-    isCurrentVideo,
-    dispatch,
-    queue,
-    allVideos,
-    video.id,
-  ]);
+  }, [played, positionInQueue, repeatVideo, isCurrentVideo, dispatch, queue, allVideos, video.id]);
 
   // Seek triggered from mini player
   useEffect(() => {
@@ -111,9 +89,7 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
 
   const handleTogglePlay = () => {
     if (isCurrentVideo) {
-      dispatch(
-        state.isPlaying ? { type: "PAUSE_VIDEO" } : { type: "PLAY_VIDEO" },
-      );
+      dispatch(state.isPlaying ? { type: "PAUSE_VIDEO" } : { type: "PLAY_VIDEO" });
     } else {
       dispatch({ type: "SET_VIDEO", payload: { video } });
       dispatch({ type: "PLAY_VIDEO" });
@@ -130,24 +106,35 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
     if (next) dispatch({ type: "SET_VIDEO", payload: { video: next } });
   };
 
-  const formatDuration = (seconds) => {
-    const mins = (video.duration || 0) / 60;
-    if (mins >= 60) {
-      return mins >= 600
-        ? new Date(seconds * 1000).toISOString().slice(11, 19)
-        : new Date(seconds * 1000).toISOString().slice(12, 19);
-    }
-    return new Date(seconds * 1000).toISOString().slice(14, 19);
-  };
-
   const handleAddToQueue = () => {
-    addOrRemoveFromQueue({
-      variables: { input: { ...video, __typename: "Video" } },
-    });
+    addOrRemoveFromQueue({ variables: { input: { ...video, __typename: "Video" } } });
   };
 
-  const showControls =
-    isCurrentVideo && !state.isVideoExpanded && (hovered || !state.isPlaying);
+  const handleShare = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(video.url).then(() => setCopied(true));
+  };
+
+  const sharedControlsProps = {
+    played,
+    playedSeconds,
+    duration: video.duration,
+    volume,
+    isPlaying: state.isPlaying,
+    repeatVideo,
+    positionInQueue,
+    queueLength: queue.length,
+    onSeekChange: (v) => setPlayed(v),
+    onSeekStart: () => setIsUserSeeking(true),
+    onSeekCommit: (v) => { setIsUserSeeking(false); reactPlayerRef.current?.seekTo(v); },
+    onVolumeChange: setVolume,
+    onPlayPrev: handlePlayPrev,
+    onPlayNext: handlePlayNext,
+    onTogglePlay: handleTogglePlay,
+    onRepeatToggle: () => setRepeatVideo(!repeatVideo),
+  };
+
+  const showControls = isCurrentVideo && !state.isVideoExpanded && (hovered || !state.isPlaying);
 
   return (
     <>
@@ -161,21 +148,13 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
           transition: "background-color 0.2s",
           "&:hover": {
             bgcolor: (theme) =>
-              theme.palette.mode === "dark"
-                ? "rgba(255,255,255,0.06)"
-                : "rgba(0,0,0,0.05)",
+              theme.palette.mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)",
           },
         }}
       >
         {/* 16:9 video area */}
-        <Box
-          sx={{
-            position: "relative",
-            aspectRatio: "16/9",
-            width: "100%",
-            bgcolor: "black",
-          }}
-        >
+        <Box sx={{ position: "relative", aspectRatio: "16/9", width: "100%", bgcolor: "black" }}>
+
           {/* Thumbnail (non-current) */}
           {!isCurrentVideo && (
             <CardMedia
@@ -202,10 +181,7 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
                       zIndex: 1301,
                       bgcolor: "black",
                     }
-                  : {
-                      width: "100%",
-                      height: "100%",
-                    }
+                  : { width: "100%", height: "100%" }
               }
             >
               <ReactPlayer
@@ -214,22 +190,14 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
                 playing={state.isPlaying}
                 volume={volume}
                 loop={repeatVideo}
+                playsinline
                 width="100%"
-                height={
-                  state.isVideoExpanded
-                    ? `calc(100% - ${MODAL_CONTROLS_HEIGHT}px)`
-                    : "100%"
-                }
+                height={state.isVideoExpanded ? `calc(100% - ${MODAL_CONTROLS_HEIGHT}px)` : "100%"}
                 style={{ pointerEvents: "none" }}
+                config={{ youtube: { playerVars: { playsinline: 1 } } }}
                 onReady={() => {
-                  if (
-                    !hasRestoredSeek.current &&
-                    initialSecondsRef.current > 0
-                  ) {
-                    reactPlayerRef.current?.seekTo(
-                      initialSecondsRef.current,
-                      "seconds",
-                    );
+                  if (!hasRestoredSeek.current && initialSecondsRef.current > 0) {
+                    reactPlayerRef.current?.seekTo(initialSecondsRef.current, "seconds");
                     hasRestoredSeek.current = true;
                   }
                 }}
@@ -237,21 +205,15 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
                   if (!isUserSeeking) {
                     setPlayed(p);
                     setPlayedSeconds(ps);
-                    if (
-                      ps - lastDispatchedSecondsRef.current >=
-                      THROTTLE_UPDATE_INTERVAL / 1000
-                    ) {
+                    if (ps - lastDispatchedSecondsRef.current >= THROTTLE_UPDATE_INTERVAL / 1000) {
                       lastDispatchedSecondsRef.current = ps;
-                      dispatch({
-                        type: "SET_PLAYED_SECONDS",
-                        payload: { playedSeconds: ps },
-                      });
+                      dispatch({ type: "SET_PLAYED_SECONDS", payload: { playedSeconds: ps } });
                     }
                   }
                 }}
               />
 
-              {/* Modal header — close button */}
+              {/* Modal close button */}
               {state.isVideoExpanded && (
                 <Box
                   onClick={(e) => e.stopPropagation()}
@@ -264,14 +226,11 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
                     justifyContent: "flex-end",
                     px: 1,
                     pt: 1,
-                    background: "transparent",
                     zIndex: 1,
                   }}
                 >
                   <Tooltip title="Close">
-                    <IconButton
-                      onClick={() => dispatch({ type: "COLLAPSE_VIDEO" })}
-                    >
+                    <IconButton onClick={() => dispatch({ type: "COLLAPSE_VIDEO" })}>
                       <Close sx={{ color: "white" }} />
                     </IconButton>
                   </Tooltip>
@@ -290,88 +249,10 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
                     px: 2,
                     pb: 1,
                     pt: 3,
-                    background:
-                      "linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%)",
+                    background: "linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%)",
                   }}
                 >
-                  {/* Progress */}
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Typography
-                      variant="caption"
-                      sx={{ color: "white", minWidth: 36, textAlign: "right" }}
-                    >
-                      {formatDuration(playedSeconds)}
-                    </Typography>
-                    <Slider
-                      value={played}
-                      min={0}
-                      max={1}
-                      step={0.01}
-                      onChange={(_, v) => setPlayed(v)}
-                      onMouseDown={() => setIsUserSeeking(true)}
-                      onChangeCommitted={(_, v) => {
-                        setIsUserSeeking(false);
-                        reactPlayerRef.current?.seekTo(v);
-                      }}
-                      sx={{
-                        color: "white",
-                        "& .MuiSlider-thumb": { width: 12, height: 12 },
-                      }}
-                    />
-                    <Typography
-                      variant="caption"
-                      sx={{ color: "white", minWidth: 36 }}
-                    >
-                      {formatDuration(video.duration)}
-                    </Typography>
-                  </Box>
-
-                  {/* Buttons */}
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <IconButton
-                      onClick={handlePlayPrev}
-                      disabled={positionInQueue <= 0}
-                    >
-                      <SkipPrevious sx={{ color: "white" }} />
-                    </IconButton>
-                    <IconButton onClick={handleTogglePlay}>
-                      {state.isPlaying ? (
-                        <Pause sx={{ color: "white", fontSize: 32 }} />
-                      ) : (
-                        <PlayArrow sx={{ color: "white", fontSize: 32 }} />
-                      )}
-                    </IconButton>
-                    <IconButton
-                      onClick={handlePlayNext}
-                      disabled={positionInQueue >= queue.length - 1}
-                    >
-                      <SkipNext sx={{ color: "white" }} />
-                    </IconButton>
-
-                    <Tooltip title="Repeat">
-                      <IconButton onClick={() => setRepeatVideo(!repeatVideo)}>
-                        <RepeatOne
-                          sx={{ color: repeatVideo ? "primary.main" : "white" }}
-                        />
-                      </IconButton>
-                    </Tooltip>
-
-                    <Box sx={{ flex: 1 }} />
-
-                    <VolumeUp sx={{ color: "white", mr: 1 }} />
-                    <Slider
-                      value={volume}
-                      min={0}
-                      max={1}
-                      step={0.01}
-                      onChange={(_, v) => setVolume(v)}
-                      sx={{
-                        width: 80,
-                        color: "white",
-                        "& .MuiSlider-thumb": { width: 12, height: 12 },
-                      }}
-                    />
-                  </Box>
+                  <PlayerControls {...sharedControlsProps} />
                 </Box>
               )}
             </Box>
@@ -381,12 +262,7 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
           {isCurrentVideo && state.isVideoExpanded && (
             <Box
               onClick={() => dispatch({ type: "COLLAPSE_VIDEO" })}
-              sx={{
-                position: "fixed",
-                inset: 0,
-                bgcolor: "rgba(0,0,0,0.85)",
-                zIndex: 1300,
-              }}
+              sx={{ position: "fixed", inset: 0, bgcolor: "rgba(0,0,0,0.85)", zIndex: 1300 }}
             />
           )}
 
@@ -434,7 +310,7 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
             <Cancel sx={{ fontSize: 18, color: "white" }} />
           </IconButton>
 
-          {/* Player controls overlay — bottom of video, current video only */}
+          {/* Inline controls overlay */}
           {isCurrentVideo && !state.isVideoExpanded && (
             <Box
               sx={{
@@ -442,8 +318,7 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
                 bottom: 0,
                 left: 0,
                 right: 0,
-                background:
-                  "linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)",
+                background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)",
                 px: 1,
                 pb: 0.5,
                 pt: 4,
@@ -451,110 +326,12 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
                 transition: "opacity 0.2s",
               }}
             >
-              {/* Progress */}
-              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: "white",
-                    fontSize: 10,
-                    minWidth: 30,
-                    textAlign: "right",
-                  }}
-                >
-                  {formatDuration(playedSeconds)}
-                </Typography>
-                <Slider
-                  value={played}
-                  min={0}
-                  max={1}
-                  step={0.01}
-                  size="small"
-                  onChange={(_, v) => setPlayed(v)}
-                  onMouseDown={() => setIsUserSeeking(true)}
-                  onChangeCommitted={(_, v) => {
-                    setIsUserSeeking(false);
-                    reactPlayerRef.current?.seekTo(v);
-                  }}
-                  sx={{
-                    color: "white",
-                    "& .MuiSlider-thumb": { width: 10, height: 10 },
-                  }}
-                />
-                <Typography
-                  variant="caption"
-                  sx={{ color: "white", fontSize: 10, minWidth: 30 }}
-                >
-                  {formatDuration(video.duration)}
-                </Typography>
-              </Box>
-
-              {/* Buttons */}
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <IconButton
-                  size="small"
-                  onClick={handlePlayPrev}
-                  disabled={positionInQueue <= 0}
-                >
-                  <SkipPrevious sx={{ color: "white", fontSize: 18 }} />
-                </IconButton>
-                <IconButton size="small" onClick={handleTogglePlay}>
-                  {state.isPlaying ? (
-                    <Pause sx={{ color: "white", fontSize: 18 }} />
-                  ) : (
-                    <PlayArrow sx={{ color: "white", fontSize: 18 }} />
-                  )}
-                </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={handlePlayNext}
-                  disabled={positionInQueue >= queue.length - 1}
-                >
-                  <SkipNext sx={{ color: "white", fontSize: 18 }} />
-                </IconButton>
-
-                <Box sx={{ flex: 1 }} />
-
-                <VolumeUp sx={{ fontSize: 14, color: "white", mr: 0.5 }} />
-                <Slider
-                  value={volume}
-                  min={0}
-                  max={1}
-                  step={0.01}
-                  size="small"
-                  onChange={(_, v) => setVolume(v)}
-                  sx={{
-                    width: 56,
-                    color: "white",
-                    "& .MuiSlider-thumb": { width: 10, height: 10 },
-                  }}
-                />
-
-                <Tooltip title="Repeat">
-                  <IconButton
-                    size="small"
-                    onClick={() => setRepeatVideo(!repeatVideo)}
-                    sx={{ ml: 0.5 }}
-                  >
-                    <RepeatOne
-                      sx={{
-                        fontSize: 16,
-                        color: repeatVideo ? "primary.main" : "white",
-                      }}
-                    />
-                  </IconButton>
-                </Tooltip>
-
-                <Tooltip title="Expand">
-                  <IconButton
-                    size="small"
-                    onClick={() => dispatch({ type: "EXPAND_VIDEO" })}
-                    sx={{ ml: 0.5 }}
-                  >
-                    <Fullscreen sx={{ fontSize: 16, color: "white" }} />
-                  </IconButton>
-                </Tooltip>
-              </Box>
+              <PlayerControls
+                {...sharedControlsProps}
+                compact
+                showExpand
+                onExpand={() => dispatch({ type: "EXPAND_VIDEO" })}
+              />
             </Box>
           )}
 
@@ -582,73 +359,16 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
           )}
         </Box>
 
-        {/* Info row */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "flex-start",
-            pt: 1.5,
-            px: 1.5,
-            pb: 2,
-          }}
-        >
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Tooltip title={title} placement="top">
-              <Typography
-                variant="body1"
-                fontWeight={600}
-                noWrap
-                sx={{ lineHeight: 1.4 }}
-              >
-                {title}
-              </Typography>
-            </Tooltip>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              noWrap
-              display="block"
-            >
-              {artist}
-            </Typography>
-          </Box>
-          <Tooltip title={currVideoInQueue ? "In queue" : "Add to queue"}>
-            <span>
-              <IconButton
-                size="small"
-                onClick={handleAddToQueue}
-                disabled={currVideoInQueue}
-                sx={{
-                  mt: "-2px",
-                  ml: 0.5,
-                  opacity: hovered || currVideoInQueue ? 1 : 0,
-                  transition: "opacity 0.2s",
-                }}
-              >
-                {currVideoInQueue ? (
-                  <Check sx={{ fontSize: 16, color: "grey.500" }} />
-                ) : (
-                  <Queue sx={{ fontSize: 16, color: "grey.400" }} />
-                )}
-              </IconButton>
-            </span>
-          </Tooltip>
-          <Tooltip title="Copy link">
-            <IconButton
-              size="small"
-              onClick={handleShare}
-              sx={{
-                mt: "-2px",
-                ml: 0.5,
-                opacity: hovered ? 1 : 0,
-                transition: "opacity 0.2s",
-              }}
-            >
-              <Share sx={{ fontSize: 16, color: "grey.400" }} />
-            </IconButton>
-          </Tooltip>
-        </Box>
+        <VideoInfoRow
+          title={title}
+          artist={artist}
+          hovered={hovered}
+          currVideoInQueue={currVideoInQueue}
+          onAddToQueue={handleAddToQueue}
+          onShare={handleShare}
+        />
       </Box>
+
       <Snackbar
         open={copied}
         autoHideDuration={2000}

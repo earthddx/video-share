@@ -1,0 +1,119 @@
+import { Typography, IconButton, Tooltip, Box, Slider } from "@mui/material";
+import {
+  PlayArrow,
+  Pause,
+  SkipPrevious,
+  SkipNext,
+  RepeatOne,
+  VolumeUp,
+  Fullscreen,
+} from "@mui/icons-material";
+
+function formatDuration(seconds, totalDuration) {
+  const mins = (totalDuration || 0) / 60;
+  if (mins >= 60) {
+    return mins >= 600
+      ? new Date(seconds * 1000).toISOString().slice(11, 19)
+      : new Date(seconds * 1000).toISOString().slice(12, 19);
+  }
+  return new Date(seconds * 1000).toISOString().slice(14, 19);
+}
+
+export default function PlayerControls({
+  played,
+  playedSeconds,
+  duration,
+  volume,
+  isPlaying,
+  repeatVideo,
+  positionInQueue,
+  queueLength,
+  compact = false,
+  showExpand = false,
+  onSeekChange,
+  onSeekStart,
+  onSeekCommit,
+  onVolumeChange,
+  onPlayPrev,
+  onPlayNext,
+  onTogglePlay,
+  onRepeatToggle,
+  onExpand,
+}) {
+  const btnSize = compact ? "small" : undefined;
+  const thumbSx = compact ? { width: 10, height: 10 } : { width: 12, height: 12 };
+  const captionSx = compact
+    ? { color: "white", fontSize: 10, minWidth: 30 }
+    : { color: "white", minWidth: 36 };
+
+  return (
+    <>
+      {/* Progress */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: compact ? 0.5 : 1 }}>
+        <Typography variant="caption" sx={{ ...captionSx, textAlign: "right" }}>
+          {formatDuration(playedSeconds, duration)}
+        </Typography>
+        <Slider
+          value={played}
+          min={0}
+          max={1}
+          step={0.01}
+          size={compact ? "small" : undefined}
+          onChange={(_, v) => onSeekChange(v)}
+          onMouseDown={onSeekStart}
+          onChangeCommitted={(_, v) => onSeekCommit(v)}
+          sx={{ color: "white", "& .MuiSlider-thumb": thumbSx }}
+        />
+        <Typography variant="caption" sx={captionSx}>
+          {formatDuration(duration, duration)}
+        </Typography>
+      </Box>
+
+      {/* Buttons */}
+      <Box sx={{ display: "flex", alignItems: "center" }}>
+        <IconButton size={btnSize} onClick={onPlayPrev} disabled={positionInQueue <= 0}>
+          <SkipPrevious sx={{ color: "white", ...(compact && { fontSize: 18 }) }} />
+        </IconButton>
+        <IconButton size={btnSize} onClick={onTogglePlay}>
+          {isPlaying ? (
+            <Pause sx={{ color: "white", fontSize: compact ? 18 : 32 }} />
+          ) : (
+            <PlayArrow sx={{ color: "white", fontSize: compact ? 18 : 32 }} />
+          )}
+        </IconButton>
+        <IconButton size={btnSize} onClick={onPlayNext} disabled={positionInQueue >= queueLength - 1}>
+          <SkipNext sx={{ color: "white", ...(compact && { fontSize: 18 }) }} />
+        </IconButton>
+
+        <Box sx={{ flex: 1 }} />
+
+        <VolumeUp sx={{ color: "white", mr: compact ? 0.5 : 1, ...(compact && { fontSize: 14 }) }} />
+        <Slider
+          value={volume}
+          min={0}
+          max={1}
+          step={0.01}
+          size={compact ? "small" : undefined}
+          onChange={(_, v) => onVolumeChange(v)}
+          sx={{ width: compact ? 56 : 80, color: "white", "& .MuiSlider-thumb": thumbSx }}
+        />
+
+        <Tooltip title="Repeat">
+          <IconButton size={btnSize} onClick={onRepeatToggle} sx={{ ml: 0.5 }}>
+            <RepeatOne
+              sx={{ color: repeatVideo ? "primary.main" : "white", ...(compact && { fontSize: 16 }) }}
+            />
+          </IconButton>
+        </Tooltip>
+
+        {showExpand && (
+          <Tooltip title="Expand">
+            <IconButton size={btnSize} onClick={onExpand} sx={{ ml: 0.5 }}>
+              <Fullscreen sx={{ color: "white", ...(compact && { fontSize: 16 }) }} />
+            </IconButton>
+          </Tooltip>
+        )}
+      </Box>
+    </>
+  );
+}
