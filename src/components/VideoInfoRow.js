@@ -1,4 +1,5 @@
-import { Typography, IconButton, Tooltip, Box } from "@mui/material";
+import { IconButton, Tooltip, Box } from "@mui/material";
+import MarqueeText from "./MarqueeText";
 import { Queue, Check, Share } from "@mui/icons-material";
 
 export default function VideoInfoRow({
@@ -12,14 +13,12 @@ export default function VideoInfoRow({
   return (
     <Box sx={{ display: "flex", alignItems: "flex-start", pt: 1.5, px: 1.5, pb: 2 }}>
       <Box sx={{ flex: 1, minWidth: 0 }}>
-        <Tooltip title={title} placement="top">
-          <Typography variant="body1" fontWeight={600} noWrap sx={{ lineHeight: 1.4 }}>
-            {title}
-          </Typography>
-        </Tooltip>
-        <Typography variant="body2" color="text.secondary" noWrap display="block">
+        <MarqueeText typographyProps={{ variant: "body1", fontWeight: 600, sx: { lineHeight: 1.4 } }}>
+          {title}
+        </MarqueeText>
+        <MarqueeText typographyProps={{ variant: "body2", color: "text.secondary" }}>
           {artist}
-        </Typography>
+        </MarqueeText>
       </Box>
 
       <Tooltip title={currVideoInQueue ? "In queue" : "Add to queue"}>

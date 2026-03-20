@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import { Box, IconButton, Typography, Avatar, Slider, Tooltip } from "@mui/material";
+import MarqueeText from "./MarqueeText";
 import { PlayArrow, Pause, SkipPrevious, SkipNext, VolumeUp, VolumeOff } from "@mui/icons-material";
 import { VideoContext } from "../App";
 
@@ -95,12 +96,12 @@ export default function MiniPlayer({ queue }) {
               "&:hover .scroll-title": { textDecoration: "underline" },
             }}
           >
-            <Typography className="scroll-title" variant="body2" fontWeight={600} noWrap>
+            <MarqueeText typographyProps={{ variant: "body2", fontWeight: 600, className: "scroll-title" }}>
               {video.title}
-            </Typography>
-            <Typography variant="caption" color="text.secondary" noWrap display="block">
+            </MarqueeText>
+            <MarqueeText typographyProps={{ variant: "caption", color: "text.secondary" }}>
               {video.artist}
-            </Typography>
+            </MarqueeText>
           </Box>
         </Tooltip>
 
