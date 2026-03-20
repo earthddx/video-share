@@ -96,10 +96,10 @@ export default function MiniPlayer({ queue }) {
               "&:hover .scroll-title": { textDecoration: "underline" },
             }}
           >
-            <MarqueeText typographyProps={{ variant: "body2", fontWeight: 600, className: "scroll-title" }}>
+            <MarqueeText always typographyProps={{ variant: "body2", fontWeight: 600, className: "scroll-title" }}>
               {video.title}
             </MarqueeText>
-            <MarqueeText typographyProps={{ variant: "caption", color: "text.secondary" }}>
+            <MarqueeText always typographyProps={{ variant: "caption", color: "text.secondary" }}>
               {video.artist}
             </MarqueeText>
           </Box>
