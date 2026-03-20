@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useRef } from "react";
+import { useState, useEffect, useContext, useRef, useCallback } from "react";
 import {
   CardMedia,
   IconButton,
@@ -60,9 +60,14 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
     setPositionInQueue(queue.findIndex((s) => s.id === video.id));
   }, [video.id, queue]);
 
+  const hasAdvancedRef = useRef(false);
+
+  useEffect(() => { hasAdvancedRef.current = false; }, [video.id]);
+
   // Auto-advance: queue first, then shared list as fallback
-  useEffect(() => {
-    if (!isCurrentVideo || played < 0.99 || repeatVideo) return;
+  const handleVideoEnd = useCallback(() => {
+    if (!isCurrentVideo || repeatVideo || hasAdvancedRef.current) return;
+    hasAdvancedRef.current = true;
     const nextInQueue = queue[positionInQueue + 1];
     if (nextInQueue) {
       setPlayed(0);
@@ -77,7 +82,12 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
         dispatch({ type: "SET_VIDEO", payload: { video: nextInList } });
       }
     }
-  }, [played, positionInQueue, repeatVideo, isCurrentVideo, dispatch, queue, allVideos, video.id]);
+  }, [isCurrentVideo, repeatVideo, queue, positionInQueue, allVideos, video.id, dispatch]);
+
+  // Fallback for YouTube (which sometimes suppresses onEnded)
+  useEffect(() => {
+    if (played >= 0.99) handleVideoEnd();
+  }, [played, handleVideoEnd]);
 
   // Seek triggered from mini player
   useEffect(() => {
@@ -201,6 +211,7 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
                     hasRestoredSeek.current = true;
                   }
                 }}
+                onEnded={handleVideoEnd}
                 onProgress={({ played: p, playedSeconds: ps }) => {
                   if (!isUserSeeking) {
                     setPlayed(p);
