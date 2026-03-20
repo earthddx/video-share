@@ -12,10 +12,10 @@ import {
   DragIndicator,
 } from "@mui/icons-material";
 import { useMutation } from "@apollo/client";
-import { VideoContext } from "../../App";
 import {useSortable} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ADD_OR_REMOVE_VIDEO_FROM_QUEUE } from "../../graphql/mutations";
+import { VideoContext } from "../../store/VideoContext";
 
 
 export default function QueuedVideo({ video }) {

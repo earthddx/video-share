@@ -15,10 +15,9 @@ import {
   LightMode,
   DarkMode,
 } from "@mui/icons-material";
-
 import AddVideo from "./add-video";
 import AboutDialog from "./AboutDialog";
-import { ThemeContext } from "../App";
+import { ThemeContext } from "../store/ThemeContext";
 
 export default function Header() {
   const greaterThanMd = useMediaQuery((theme) => theme.breakpoints.up("md"));

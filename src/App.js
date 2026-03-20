@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useReducer,
-  useState,
-  useMemo,
-  useEffect,
-} from "react";
+import { useContext, useReducer, useState, useMemo, useEffect } from "react";
 import {
   Grid,
   useMediaQuery,
@@ -22,38 +15,10 @@ import Header from "./components/Header";
 import VideoList from "./components/video/VideoList";
 import QueuedVideoList from "./components/queue/QueuedVideoList";
 import MiniPlayer from "./components/miniplayer";
-import videoReducer from "./reducer";
+import videoReducer from "./store/reducer";
 import { GET_QUEUED_VIDEOS } from "./graphql/queries";
-
-const _savedVideo = (() => {
-  try {
-    return JSON.parse(localStorage.getItem("currentVideo"));
-  } catch {
-    return null;
-  }
-})();
-const _savedSeconds = Number(localStorage.getItem("playedSeconds")) || 0;
-
-export const VideoContext = createContext({
-  video: _savedVideo ?? {
-    artist: "",
-    title: "",
-    duration: 0,
-    id: "",
-    thumbnail: "",
-    url: "",
-  },
-  isPlaying: false,
-  playedSeconds: _savedSeconds,
-  isVideoExpanded: false,
-  seekTo: null,
-  volume: 1,
-});
-
-export const ThemeContext = createContext({
-  mode: "dark",
-  toggleTheme: () => {},
-});
+import { VideoContext } from "./store/VideoContext";
+import { ThemeContext } from "./store/ThemeContext";
 
 // Inner component — rendered inside ThemeProvider so useMediaQuery can read the theme
 function AppInner() {

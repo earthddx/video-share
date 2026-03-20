@@ -10,9 +10,8 @@ import {
 } from "@mui/icons-material";
 import ReactPlayer from "react-player";
 import { useQuery } from "@apollo/client";
-
-import { VideoContext } from "../../App";
 import { GET_QUEUED_VIDEOS } from "../../graphql/queries";
+import { VideoContext } from "../../store/VideoContext";
 
 export default function VideoPlayer() {
   const { data } = useQuery(GET_QUEUED_VIDEOS);
@@ -27,7 +26,9 @@ export default function VideoPlayer() {
   const reactPlayerRef = useRef();
 
   useEffect(() => {
-    const videoIndex = data.queue.findIndex((video) => video.id === state.video.id);
+    const videoIndex = data.queue.findIndex(
+      (video) => video.id === state.video.id,
+    );
     setPositionInQueue(videoIndex);
   }, [state.video.id, data.queue]);
 
@@ -40,7 +41,9 @@ export default function VideoPlayer() {
   }, [data.queue, played, dispatch, positionInQueue, repeatVideo]);
 
   const handleTogglePlay = () => {
-    dispatch(state.isPlaying ? { type: "PAUSE_VIDEO" } : { type: "PLAY_VIDEO" });
+    dispatch(
+      state.isPlaying ? { type: "PAUSE_VIDEO" } : { type: "PLAY_VIDEO" },
+    );
   };
 
   const handleSliderProgressChange = (_, newValue) => {
@@ -155,7 +158,11 @@ export default function VideoPlayer() {
           </div>
 
           <div style={{ display: "flex", alignItems: "center" }}>
-            <Typography variant="caption" component="h6" style={{ marginRight: 10 }}>
+            <Typography
+              variant="caption"
+              component="h6"
+              style={{ marginRight: 10 }}
+            >
               {formatDuration(playedSeconds)}
             </Typography>
             <Slider
@@ -167,7 +174,11 @@ export default function VideoPlayer() {
               onMouseDown={handleSeekMouseDown}
               onChangeCommitted={handleSeekCommitted}
             />
-            <Typography variant="caption" component="h6" style={{ marginLeft: 10 }}>
+            <Typography
+              variant="caption"
+              component="h6"
+              style={{ marginLeft: 10 }}
+            >
               {formatDuration(state.video.duration)}
             </Typography>
           </div>
@@ -176,30 +187,39 @@ export default function VideoPlayer() {
           {state.isVideoExpanded && (
             <Box
               onClick={() => dispatch({ type: "COLLAPSE_VIDEO" })}
-              sx={{ position: "fixed", inset: 0, bgcolor: "rgba(0,0,0,0.85)", zIndex: 1300 }}
+              sx={{
+                position: "fixed",
+                inset: 0,
+                bgcolor: "rgba(0,0,0,0.85)",
+                zIndex: 1300,
+              }}
             />
           )}
 
           {/* Single ReactPlayer — repositions via CSS, never remounts */}
           <Box
-            sx={state.isVideoExpanded ? {
-              position: "fixed",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: "80vw",
-              height: "45vw",
-              zIndex: 1301,
-              pointerEvents: "auto",
-            } : {
-              position: "absolute",
-              right: 50,
-              marginTop: "40px",
-              width: "20vw",
-              height: "11.5vw",
-              pointerEvents: "none",
-              display: toggleVideo ? "none" : "block",
-            }}
+            sx={
+              state.isVideoExpanded
+                ? {
+                    position: "fixed",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    width: "80vw",
+                    height: "45vw",
+                    zIndex: 1301,
+                    pointerEvents: "auto",
+                  }
+                : {
+                    position: "absolute",
+                    right: 50,
+                    marginTop: "40px",
+                    width: "20vw",
+                    height: "11.5vw",
+                    pointerEvents: "none",
+                    display: toggleVideo ? "none" : "block",
+                  }
+            }
           >
             <Suspense fallback={null}>
               <ReactPlayer
@@ -214,7 +234,10 @@ export default function VideoPlayer() {
                   if (!isUserSeeking) {
                     setPlayed(played);
                     setPlayedSeconds(playedSeconds);
-                    dispatch({ type: "SET_PLAYED_SECONDS", payload: { playedSeconds } });
+                    dispatch({
+                      type: "SET_PLAYED_SECONDS",
+                      payload: { playedSeconds },
+                    });
                   }
                 }}
                 ref={reactPlayerRef}

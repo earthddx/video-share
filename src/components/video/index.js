@@ -14,11 +14,10 @@ import {
 } from "@mui/icons-material";
 import { useMutation } from "@apollo/client";
 import ReactPlayer from "react-player";
-
 import { ADD_OR_REMOVE_VIDEO_FROM_QUEUE } from "../../graphql/mutations";
-import { VideoContext } from "../../App";
 import PlayerControls from "./PlayerControls";
 import VideoInfoRow from "./VideoInfoRow";
+import { VideoContext } from "../../store/VideoContext";
 
 const MODAL_CONTROLS_HEIGHT = 80;
 const THROTTLE_UPDATE_INTERVAL = 5000; // ms

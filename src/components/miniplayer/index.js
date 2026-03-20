@@ -16,8 +16,8 @@ import {
   VolumeUp,
   VolumeOff,
 } from "@mui/icons-material";
-import { VideoContext } from "../../App";
 import { formatDuration } from "../../helpers/formatDuration";
+import { VideoContext } from "../../store/VideoContext";
 
 export default function MiniPlayer({ queue }) {
   const { state, dispatch } = useContext(VideoContext);
