@@ -89,6 +89,17 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
     if (played >= 0.99) handleVideoEnd();
   }, [played, handleVideoEnd]);
 
+  // Lock orientation to landscape on mobile when expanded
+  useEffect(() => {
+    if (!isCurrentVideo) return;
+    if (state.isVideoExpanded) {
+      window.screen.orientation?.lock?.("landscape").catch(() => {});
+    } else {
+      window.screen.orientation?.unlock?.();
+    }
+    return () => window.screen.orientation?.unlock?.();
+  }, [state.isVideoExpanded, isCurrentVideo]);
+
   // Seek triggered from mini player
   useEffect(() => {
     if (!isCurrentVideo || state.seekTo == null) return;
@@ -184,11 +195,11 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
                 state.isVideoExpanded
                   ? {
                       position: "fixed",
-                      top: "50%",
-                      left: "50%",
-                      transform: "translate(-50%, -50%)",
-                      width: "80vw",
-                      height: "45vw",
+                      top: { xs: 0, sm: "50%" },
+                      left: { xs: 0, sm: "50%" },
+                      transform: { xs: "none", sm: "translate(-50%, -50%)" },
+                      width: { xs: "100vw", sm: "80vw" },
+                      height: { xs: "100vh", sm: "45vw" },
                       zIndex: 1301,
                       bgcolor: "black",
                     }
