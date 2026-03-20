@@ -116,7 +116,7 @@ export default function VideoList({ queue }) {
         open={toast.open}
         autoHideDuration={4000}
         onClose={() => setToast((t) => ({ ...t, open: false }))}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
       >
         <Alert
           onClose={() => setToast((t) => ({ ...t, open: false }))}
