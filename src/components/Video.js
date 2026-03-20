@@ -374,7 +374,7 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
         autoHideDuration={2000}
         onClose={() => setCopied(false)}
         message="Link copied to clipboard"
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
       />
     </>
   );
