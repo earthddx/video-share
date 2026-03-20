@@ -36,6 +36,12 @@ export default function MiniPlayer({ queue }) {
     dispatch({ type: "SEEK_TO", payload: { fraction: v } });
   };
 
+  const handleScrollToVideo = () => {
+    document
+      .querySelector(`[data-video-id="${video.id}"]`)
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+
   return (
     <Box
       sx={{
@@ -62,21 +68,41 @@ export default function MiniPlayer({ queue }) {
           pb: 0.5,
         }}
       >
-        <Avatar
-          variant="rounded"
-          src={video.thumbnail}
-          alt={video.title}
-          sx={{ width: 38, height: 38, flexShrink: 0 }}
-        />
+        <Tooltip title="Scroll to video" placement="top">
+          <Avatar
+            variant="rounded"
+            src={video.thumbnail}
+            alt={video.title}
+            onClick={handleScrollToVideo}
+            sx={{
+              width: 38,
+              height: 38,
+              flexShrink: 0,
+              cursor: "pointer",
+              transition: "opacity 0.15s",
+              "&:hover": { opacity: 0.75 },
+            }}
+          />
+        </Tooltip>
 
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Typography variant="body2" fontWeight={600} noWrap>
-            {video.title}
-          </Typography>
-          <Typography variant="caption" color="text.secondary" noWrap display="block">
-            {video.artist}
-          </Typography>
-        </Box>
+        <Tooltip title="Scroll to video" placement="top">
+          <Box
+            onClick={handleScrollToVideo}
+            sx={{
+              flex: 1,
+              minWidth: 0,
+              cursor: "pointer",
+              "&:hover .scroll-title": { textDecoration: "underline" },
+            }}
+          >
+            <Typography className="scroll-title" variant="body2" fontWeight={600} noWrap>
+              {video.title}
+            </Typography>
+            <Typography variant="caption" color="text.secondary" noWrap display="block">
+              {video.artist}
+            </Typography>
+          </Box>
+        </Tooltip>
 
         <Tooltip title="Previous">
           <span>
@@ -102,7 +128,7 @@ export default function MiniPlayer({ queue }) {
           </span>
         </Tooltip>
 
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, ml: 0.5 }}>
+        <Box sx={{ display: { xs: "none", sm: "flex" }, alignItems: "center", gap: 0.5, ml: 0.5 }}>
           <IconButton
             size="small"
             onClick={() => dispatch({ type: "SET_VOLUME", payload: { volume: volume > 0 ? 0 : 1 } })}

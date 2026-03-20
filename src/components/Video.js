@@ -149,6 +149,7 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
   return (
     <>
       <Box
+        data-video-id={video.id}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         sx={{
