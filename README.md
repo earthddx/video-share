@@ -14,6 +14,7 @@ A real-time collaborative video queue — paste a link, everyone sees it instant
 - **Real-time sync** — videos added or removed appear instantly for all connected users via GraphQL subscriptions
 - **Queue management** — add to queue, drag to reorder, shuffle / unshuffle, clear all
 - **Full playback controls** — seek, volume, repeat, picture-in-picture expand
+- **Reliable auto-advance** — uses `onEnded` for HTML5/non-YouTube sources; falls back to a `played >= 0.99` heuristic for YouTube (which sometimes suppresses `onEnded`); a guard ref prevents double-firing
 - **Mini player** — persistent bar at the bottom with progress, seek and volume controls
 - **Dark / light theme** — persisted across sessions
 - **Keyboard shortcuts** — `Space` to play/pause, `←` / `→` to skip tracks
