@@ -11,16 +11,18 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
-import { useSubscription, useMutation } from "@apollo/client";
+import { useSubscription, useMutation, useApolloClient } from "@apollo/client";
 
 import { GET_VIDEOS } from "../graphql/subscriptions";
 import { DELETE_VIDEO } from "../graphql/mutations";
+import { GET_QUEUED_VIDEOS } from "../graphql/queries";
 
 import Video from "./Video";
 
 export default function VideoList({ queue }) {
   const { data, loading, error } = useSubscription(GET_VIDEOS);
   const [deleteVideo] = useMutation(DELETE_VIDEO);
+  const apolloClient = useApolloClient();
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
   const [toast, setToast] = useState({ open: false, message: "", severity: "info" });
   const prevVideosRef = useRef(null);
@@ -80,6 +82,15 @@ export default function VideoList({ queue }) {
 
   const handleConfirmDelete = () => {
     deleteVideo({ variables: { id: pendingDeleteId } });
+
+    // Also remove from queue if present
+    const cached = apolloClient.cache.readQuery({ query: GET_QUEUED_VIDEOS });
+    if (cached?.queue?.some((v) => v.id === pendingDeleteId)) {
+      const newQueue = cached.queue.filter((v) => v.id !== pendingDeleteId);
+      apolloClient.cache.writeQuery({ query: GET_QUEUED_VIDEOS, data: { queue: newQueue } });
+      localStorage.setItem("queue", JSON.stringify(newQueue));
+    }
+
     setPendingDeleteId(null);
   };
 
