@@ -7,6 +7,10 @@ import {
   Fab,
   Drawer,
   Box,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Typography,
 } from "@mui/material";
 import { QueueMusic } from "@mui/icons-material";
 import { useQuery } from "@apollo/client";
@@ -27,6 +31,7 @@ function AppInner() {
   const [state, dispatch] = useReducer(videoReducer, context);
   const greaterThanMd = useMediaQuery((theme) => theme.breakpoints.up("md"));
   const [mobileQueueOpen, setMobileQueueOpen] = useState(false);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [fabPos, setFabPos] = useState(() => {
     try { return JSON.parse(localStorage.getItem("fabPos")); } catch { return null; }
   });
@@ -81,7 +86,9 @@ function AppInner() {
       if (tag === "INPUT" || tag === "TEXTAREA" || e.target.isContentEditable)
         return;
 
-      if (e.code === "Space") {
+      if (e.key === "?") {
+        setShortcutsOpen((v) => !v);
+      } else if (e.code === "Space") {
         e.preventDefault();
         if (!state.video.id) return;
         dispatch(
@@ -181,6 +188,28 @@ function AppInner() {
           <QueuedVideoList queue={queue} />
         </Box>
       </Drawer>
+      {/* Keyboard shortcuts dialog */}
+      <Dialog open={shortcutsOpen} onClose={() => setShortcutsOpen(false)} maxWidth="xs" fullWidth>
+        <DialogTitle>Keyboard shortcuts</DialogTitle>
+        <DialogContent>
+          {[
+            ["Space", "Play / Pause"],
+            ["→", "Next in queue"],
+            ["←", "Previous in queue"],
+            ["?", "Toggle this overlay"],
+          ].map(([key, label]) => (
+            <Box key={key} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", py: 0.75 }}>
+              <Typography variant="body2" color="text.secondary">{label}</Typography>
+              <Box component="kbd" sx={{
+                px: 1, py: 0.25, borderRadius: 1, fontSize: 13, fontFamily: "monospace",
+                bgcolor: "action.hover", border: "1px solid", borderColor: "divider",
+              }}>
+                {key}
+              </Box>
+            </Box>
+          ))}
+        </DialogContent>
+      </Dialog>
     </VideoContext.Provider>
   );
 }

@@ -6,6 +6,7 @@ import {
   Button,
   Typography,
   Link,
+  Box,
 } from "@mui/material";
 
 export default function AboutDialog({ open, onClose }) {
@@ -47,6 +48,20 @@ export default function AboutDialog({ open, onClose }) {
           Your personal playback queue is saved to{" "}
           <strong>localStorage</strong> in your browser and is not shared with
           other users.
+        </Typography>
+
+        <Typography variant="subtitle1" gutterBottom fontWeight="bold" mt={1}>
+          Keyboard shortcuts
+        </Typography>
+        <Typography variant="body2">
+          Press{" "}
+          <Box component="kbd" sx={{
+            px: 0.75, py: 0.25, borderRadius: 1, fontSize: 13, fontFamily: "monospace",
+            bgcolor: "action.hover", border: "1px solid", borderColor: "divider",
+          }}>
+            ?
+          </Box>
+          {" "}anywhere to view all available keyboard shortcuts.
         </Typography>
       </DialogContent>
       <DialogActions>
