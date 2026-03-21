@@ -1,4 +1,11 @@
-import { useContext, useReducer, useState, useMemo, useEffect, useRef } from "react";
+import {
+  useContext,
+  useReducer,
+  useState,
+  useMemo,
+  useEffect,
+  useRef,
+} from "react";
 import {
   Grid,
   useMediaQuery,
@@ -37,7 +44,11 @@ function AppInner() {
   const [filter, setFilter] = useState("");
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [fabPos, setFabPos] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("fabPos")); } catch { return null; }
+    try {
+      return JSON.parse(localStorage.getItem("fabPos"));
+    } catch {
+      return null;
+    }
   });
   const fabDragRef = useRef(null);
   const latestFabPosRef = useRef(fabPos);
@@ -46,8 +57,10 @@ function AppInner() {
   const handleFabPointerDown = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
     fabDragRef.current = {
-      startX: e.clientX, startY: e.clientY,
-      offsetX: e.clientX - rect.left, offsetY: e.clientY - rect.top,
+      startX: e.clientX,
+      startY: e.clientY,
+      offsetX: e.clientX - rect.left,
+      offsetY: e.clientY - rect.top,
       moved: false,
     };
     e.currentTarget.setPointerCapture(e.pointerId);
@@ -57,12 +70,19 @@ function AppInner() {
     if (!fabDragRef.current) return;
     const { startX, startY, offsetX, offsetY } = fabDragRef.current;
     if (!fabDragRef.current.moved) {
-      if (Math.abs(e.clientX - startX) < 5 && Math.abs(e.clientY - startY) < 5) return;
+      if (Math.abs(e.clientX - startX) < 5 && Math.abs(e.clientY - startY) < 5)
+        return;
       fabDragRef.current.moved = true;
     }
     const size = 56;
-    const x = Math.max(8, Math.min(window.innerWidth - size - 8, e.clientX - offsetX));
-    const y = Math.max(8, Math.min(window.innerHeight - size - 8, e.clientY - offsetY));
+    const x = Math.max(
+      8,
+      Math.min(window.innerWidth - size - 8, e.clientX - offsetX),
+    );
+    const y = Math.max(
+      8,
+      Math.min(window.innerHeight - size - 8, e.clientY - offsetY),
+    );
     const pos = { x, y };
     latestFabPosRef.current = pos;
     setFabPos(pos);
@@ -70,12 +90,16 @@ function AppInner() {
 
   const handleFabPointerUp = () => {
     wasDragRef.current = fabDragRef.current?.moved ?? false;
-    if (wasDragRef.current) localStorage.setItem("fabPos", JSON.stringify(latestFabPosRef.current));
+    if (wasDragRef.current)
+      localStorage.setItem("fabPos", JSON.stringify(latestFabPosRef.current));
     fabDragRef.current = null;
   };
 
   const handleFabClick = () => {
-    if (wasDragRef.current) { wasDragRef.current = false; return; }
+    if (wasDragRef.current) {
+      wasDragRef.current = false;
+      return;
+    }
     setMobileQueueOpen(true);
   };
   const queue = useMemo(() => data?.queue ?? [], [data?.queue]);
@@ -147,21 +171,19 @@ function AppInner() {
                 placeholder="Filter by title or artist…"
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                slotProps={{
-                  input: {
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Search fontSize="small" sx={{ color: "text.disabled" }} />
-                      </InputAdornment>
-                    ),
-                    endAdornment: filter && (
-                      <InputAdornment position="end">
-                        <IconButton size="small" onClick={() => setFilter("")}>
-                          <Clear fontSize="small" />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  },
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search fontSize="small" sx={{ color: "text.disabled" }} />
+                    </InputAdornment>
+                  ),
+                  endAdornment: filter ? (
+                    <InputAdornment position="end">
+                      <IconButton size="small" edge="end" onClick={() => setFilter("")}>
+                        <Clear fontSize="small" />
+                      </IconButton>
+                    </InputAdornment>
+                  ) : null,
                 }}
               />
             </Box>
@@ -177,21 +199,19 @@ function AppInner() {
                 placeholder="Filter by title or artist…"
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                slotProps={{
-                  input: {
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Search fontSize="small" sx={{ color: "text.disabled" }} />
-                      </InputAdornment>
-                    ),
-                    endAdornment: filter && (
-                      <InputAdornment position="end">
-                        <IconButton size="small" onClick={() => setFilter("")}>
-                          <Clear fontSize="small" />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  },
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search fontSize="small" sx={{ color: "text.disabled" }} />
+                    </InputAdornment>
+                  ),
+                  endAdornment: filter ? (
+                    <InputAdornment position="end">
+                      <IconButton size="small" edge="end" onClick={() => setFilter("")}>
+                        <Clear fontSize="small" />
+                      </IconButton>
+                    </InputAdornment>
+                  ) : null,
                 }}
               />
             </Box>
@@ -212,8 +232,11 @@ function AppInner() {
             position: "fixed",
             ...(fabPos
               ? { top: fabPos.y, left: fabPos.x }
-              : { bottom: hasMiniPlayer ? 130 : 24, right: 24, transition: "bottom 0.2s" }
-            ),
+              : {
+                  bottom: hasMiniPlayer ? 130 : 24,
+                  right: 24,
+                  transition: "bottom 0.2s",
+                }),
             zIndex: 1200,
             touchAction: "none",
           }}
@@ -245,7 +268,12 @@ function AppInner() {
         </Box>
       </Drawer>
       {/* Keyboard shortcuts dialog */}
-      <Dialog open={shortcutsOpen} onClose={() => setShortcutsOpen(false)} maxWidth="xs" fullWidth>
+      <Dialog
+        open={shortcutsOpen}
+        onClose={() => setShortcutsOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
         <DialogTitle>Keyboard shortcuts</DialogTitle>
         <DialogContent>
           {[
@@ -254,12 +282,31 @@ function AppInner() {
             ["←", "Previous in queue"],
             ["?", "Toggle this overlay"],
           ].map(([key, label]) => (
-            <Box key={key} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", py: 0.75 }}>
-              <Typography variant="body2" color="text.secondary">{label}</Typography>
-              <Box component="kbd" sx={{
-                px: 1, py: 0.25, borderRadius: 1, fontSize: 13, fontFamily: "monospace",
-                bgcolor: "action.hover", border: "1px solid", borderColor: "divider",
-              }}>
+            <Box
+              key={key}
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                py: 0.75,
+              }}
+            >
+              <Typography variant="body2" color="text.secondary">
+                {label}
+              </Typography>
+              <Box
+                component="kbd"
+                sx={{
+                  px: 1,
+                  py: 0.25,
+                  borderRadius: 1,
+                  fontSize: 13,
+                  fontFamily: "monospace",
+                  bgcolor: "action.hover",
+                  border: "1px solid",
+                  borderColor: "divider",
+                }}
+              >
                 {key}
               </Box>
             </Box>

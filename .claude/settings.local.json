@@ -3,7 +3,8 @@
     "allow": [
       "Bash(git mv:*)",
       "Bash(find d:Projectsmusic-share -maxdepth 2 -type f \\\\\\(-name *.env* -o -name *.config.* -o -name *.graphql \\\\\\))",
-      "Bash(npx react-scripts:*)"
+      "Bash(npx react-scripts:*)",
+      "WebFetch(domain:mui.com)"
     ]
   }
 }

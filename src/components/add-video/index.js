@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { TextField, Button } from "@mui/material";
-import { Add } from "@mui/icons-material";
+import { TextField, Button, InputAdornment, IconButton } from "@mui/material";
+import { Add, Clear } from "@mui/icons-material";
 import ReactPlayer from "react-player";
 
 import AddVideoDialog from "./AddVideoDialog";
@@ -115,6 +115,15 @@ export default function AddVideo() {
         onChange={(e) => setUrl(sanitizeUrl(e.target.value))}
         value={url}
         placeholder="YouTube, Vimeo, SoundCloud…"
+        InputProps={{
+          endAdornment: url ? (
+            <InputAdornment position="end">
+              <IconButton size="small" edge="end" onClick={() => setUrl("")}>
+                <Clear fontSize="small" />
+              </IconButton>
+            </InputAdornment>
+          ) : null,
+        }}
       />
       <Button
         variant="contained"
