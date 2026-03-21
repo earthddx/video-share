@@ -43,7 +43,7 @@ export default function Header() {
         )}
 
         {/* AddVideo — full width on mobile, 8 cols on desktop */}
-        <Grid item xs={10} md={greaterThanMd ? 8 : 10} sx={{ px: 2 }}>
+        <Grid item xs={10} md={greaterThanMd ? 8 : 10} sx={{ px: { xs: 0, md: 2 } }}>
           <AddVideo />
         </Grid>
 
