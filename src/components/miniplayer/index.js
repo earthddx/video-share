@@ -26,7 +26,14 @@ export default function MiniPlayer({ queue }) {
     isPlaying,
     isVideoExpanded,
     volume = 1,
+    playbackRate = 1,
   } = state;
+
+  const handleSpeedChange = () => {
+    const speeds = [0.75, 1, 1.25, 1.5, 2];
+    const next = speeds[(speeds.indexOf(playbackRate) + 1) % speeds.length];
+    dispatch({ type: "SET_PLAYBACK_RATE", payload: { playbackRate: next } });
+  };
 
   const [playedSeconds, setPlayedSeconds] = useState(state.playedSeconds);
 
@@ -58,9 +65,11 @@ export default function MiniPlayer({ queue }) {
   };
 
   const handleScrollToVideo = () => {
-    document
-      .querySelector(`[data-video-id="${video.id}"]`)
-      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+    const el = document.querySelector(`[data-video-id="${video.id}"]`);
+    el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent("highlightVideo", { detail: { id: video.id } }));
+    }, 600);
   };
 
   return (
@@ -195,6 +204,13 @@ export default function MiniPlayer({ queue }) {
             }
             sx={{ width: 72, "& .MuiSlider-thumb": { width: 10, height: 10 } }}
           />
+          <Tooltip title="Playback speed">
+            <IconButton size="small" onClick={handleSpeedChange} sx={{ width: 36 }}>
+              <Typography sx={{ fontSize: 11, fontWeight: 700, color: playbackRate !== 1 ? "primary.main" : "text.primary", lineHeight: 1 }}>
+                {playbackRate}×
+              </Typography>
+            </IconButton>
+          </Tooltip>
         </Box>
       </Box>
 

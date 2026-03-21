@@ -30,6 +30,8 @@ export default function PlayerControls({
   onTogglePlay,
   onRepeatToggle,
   onExpand,
+  playbackRate = 1,
+  onSpeedChange,
 }) {
   const btnSize = compact ? "small" : undefined;
   const thumbSx = compact ? { width: 10, height: 10 } : { width: 12, height: 12 };
@@ -96,6 +98,18 @@ export default function PlayerControls({
             />
           </IconButton>
         </Tooltip>
+
+        {!compact && (
+          <>
+            <Tooltip title="Playback speed">
+              <IconButton size={btnSize} onClick={onSpeedChange} sx={{ ml: 0.5 }}>
+                <Typography sx={{ color: playbackRate !== 1 ? "primary.main" : "white", fontSize: 12, fontWeight: 700, lineHeight: 1 }}>
+                  {playbackRate}×
+                </Typography>
+              </IconButton>
+            </Tooltip>
+          </>
+        )}
 
         {showExpand && (
           <Tooltip title="Expand">

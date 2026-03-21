@@ -27,6 +27,9 @@ const videoReducer = (state, action) => {
     case "SET_VOLUME": {
       return { ...state, volume: action.payload.volume };
     }
+    case "SET_PLAYBACK_RATE": {
+      return { ...state, playbackRate: action.payload.playbackRate };
+    }
     default:
       return state;
   }

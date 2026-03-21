@@ -23,4 +23,5 @@ export const VideoContext = createContext({
   isVideoExpanded: false,
   seekTo: null,
   volume: 1,
+  playbackRate: 1,
 });
