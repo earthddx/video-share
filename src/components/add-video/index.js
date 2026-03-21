@@ -91,7 +91,7 @@ export default function AddVideo() {
     <div
       style={{
         display: "flex",
-        alignItems: "center",
+        alignItems: "stretch",
         justifyContent: "center",
         gap: 8,
         padding: "12px 16px",
@@ -118,7 +118,7 @@ export default function AddVideo() {
       />
       <Button
         variant="contained"
-        size="medium"
+        size="small"
         onClick={() => setDialog(true)}
         disabled={!playable}
         startIcon={<Add />}
