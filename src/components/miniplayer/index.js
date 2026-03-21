@@ -69,7 +69,7 @@ export default function MiniPlayer({ queue }) {
     el?.scrollIntoView({ behavior: "smooth", block: "center" });
     setTimeout(() => {
       window.dispatchEvent(new CustomEvent("highlightVideo", { detail: { id: video.id } }));
-    }, 600);
+    }, 300);
   };
 
   return (
