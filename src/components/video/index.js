@@ -29,6 +29,7 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
 
   const [currVideoInQueue, setCurrVideoInQueue] = useState(false);
   const [hovered, setHovered] = useState(false);
+  const [highlighted, setHighlighted] = useState(false);
   const [played, setPlayed] = useState(0);
   const [playedSeconds, setPlayedSeconds] = useState(0);
   const [isUserSeeking, setIsUserSeeking] = useState(false);
@@ -43,6 +44,17 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
   const initialSecondsRef = useRef(isCurrentVideo ? state.playedSeconds : 0);
   const hasRestoredSeek = useRef(false);
   const lastDispatchedSecondsRef = useRef(0);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.detail.id !== video.id) return;
+      setHighlighted(true);
+      setTimeout(() => setHighlighted(false), 900);
+    };
+    window.addEventListener("highlightVideo", handler);
+    return () => window.removeEventListener("highlightVideo", handler);
+  }, [video.id]);
+
 
   const [addOrRemoveFromQueue] = useMutation(ADD_OR_REMOVE_VIDEO_FROM_QUEUE, {
     onCompleted: (data) => {
@@ -151,6 +163,13 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
     onPlayNext: handlePlayNext,
     onTogglePlay: handleTogglePlay,
     onRepeatToggle: () => setRepeatVideo(!repeatVideo),
+    playbackRate: state.playbackRate ?? 1,
+    onSpeedChange: () => {
+      const speeds = [0.75, 1, 1.25, 1.5, 2];
+      const next = speeds[(speeds.indexOf(state.playbackRate ?? 1) + 1) % speeds.length];
+      dispatch({ type: "SET_PLAYBACK_RATE", payload: { playbackRate: next } });
+    },
+
   };
 
   const showControls = isCurrentVideo && !state.isVideoExpanded && (hovered || !state.isPlaying);
@@ -170,6 +189,11 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
             bgcolor: (theme) =>
               theme.palette.mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)",
           },
+          "@keyframes videoHighlight": {
+            "0%, 100%": { backgroundColor: "transparent", boxShadow: "0 0 0 0px rgba(239,83,80,0)" },
+            "30%": { backgroundColor: "rgba(239,83,80,0.15)", boxShadow: "0 0 0 2px rgba(239,83,80,0.85)" },
+          },
+          ...(highlighted && { animation: "videoHighlight 0.9s ease-out" }),
         }}
       >
         {/* 16:9 video area */}
@@ -209,6 +233,7 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
                 url={video.url}
                 playing={state.isPlaying}
                 volume={volume}
+                playbackRate={state.playbackRate ?? 1}
                 loop={repeatVideo}
                 playsinline
                 width="100%"
@@ -233,6 +258,7 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
                       lastDispatchedSecondsRef.current = ps;
                       dispatch({ type: "SET_PLAYED_SECONDS", payload: { playedSeconds: ps } });
                     }
+
                   }
                 }}
               />
