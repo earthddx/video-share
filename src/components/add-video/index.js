@@ -1,14 +1,32 @@
 import React, { useState, useEffect } from "react";
-import { TextField, Button, InputAdornment, IconButton } from "@mui/material";
+import { TextField, Button, InputAdornment, IconButton, Tooltip } from "@mui/material";
 import { Add, Clear } from "@mui/icons-material";
 import ReactPlayer from "react-player";
+import { useSubscription } from "@apollo/client";
 
+import { GET_VIDEOS } from "../../graphql/subscriptions";
 import AddVideoDialog from "./AddVideoDialog";
+
+function sanitizeUrl(raw) {
+  try {
+    const parsed = new URL(raw);
+    if (/youtube\.com/.test(parsed.hostname)) {
+      const v = parsed.searchParams.get("v");
+      return v ? `https://www.youtube.com/watch?v=${v}` : raw;
+    }
+    if (/youtu\.be/.test(parsed.hostname)) {
+      return `https://www.youtube.com/watch?v=${parsed.pathname.slice(1)}`;
+    }
+  } catch (_) {}
+  return raw;
+}
 
 export default function AddVideo() {
   const [dialog, setDialog] = useState(false);
   const [url, setUrl] = useState("");
   const [playable, setPlayable] = useState(false);
+  const { data: videosData } = useSubscription(GET_VIDEOS);
+  const isDuplicate = !!url && (videosData?.videos ?? []).some((v) => sanitizeUrl(v.url) === url);
   const [video, setVideo] = useState({
     duration: 0,
     title: "",
@@ -20,20 +38,6 @@ export default function AddVideo() {
     const isPlayable = ReactPlayer.canPlay(url);
     setPlayable(isPlayable);
   }, [url]);
-
-  const sanitizeUrl = (raw) => {
-    try {
-      const parsed = new URL(raw);
-      if (/youtube\.com/.test(parsed.hostname)) {
-        const v = parsed.searchParams.get("v");
-        return v ? `https://www.youtube.com/watch?v=${v}` : raw;
-      }
-      if (/youtu\.be/.test(parsed.hostname)) {
-        return `https://www.youtube.com/watch?v=${parsed.pathname.slice(1)}`;
-      }
-    } catch (_) {}
-    return raw;
-  };
 
   const handleEditVideo = async ({ player }) => {
     // YouTube — use player API for full metadata
@@ -91,7 +95,7 @@ export default function AddVideo() {
     <div
       style={{
         display: "flex",
-        alignItems: "stretch",
+        alignItems: "flex-start",
         justifyContent: "center",
         gap: 8,
         padding: "12px 16px",
@@ -115,6 +119,7 @@ export default function AddVideo() {
         onChange={(e) => setUrl(sanitizeUrl(e.target.value))}
         value={url}
         placeholder="YouTube, Vimeo, SoundCloud…"
+        error={isDuplicate}
         InputProps={{
           endAdornment: url ? (
             <InputAdornment position="end">
@@ -125,16 +130,20 @@ export default function AddVideo() {
           ) : null,
         }}
       />
-      <Button
-        variant="contained"
-        size="small"
-        onClick={() => setDialog(true)}
-        disabled={!playable}
-        startIcon={<Add />}
-        sx={{ whiteSpace: "nowrap", flexShrink: 0 }}
-      >
-        Add
-      </Button>
+      <Tooltip title={isDuplicate ? "Already in the library" : ""}>
+        <span>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => setDialog(true)}
+            disabled={!playable || isDuplicate}
+            startIcon={<Add />}
+            sx={{ whiteSpace: "nowrap", flexShrink: 0, height: 40 }}
+          >
+            {isDuplicate ? "Already added" : "Add"}
+          </Button>
+        </span>
+      </Tooltip>
       <ReactPlayer url={url} hidden onReady={handleEditVideo} />
     </div>
   );
