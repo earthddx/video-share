@@ -10,6 +10,7 @@ import {
   Button,
   Snackbar,
   Alert,
+  Typography,
 } from "@mui/material";
 import { useSubscription, useMutation, useApolloClient } from "@apollo/client";
 
@@ -19,7 +20,7 @@ import { GET_QUEUED_VIDEOS } from "../../graphql/queries";
 
 import Video from ".";
 
-export default function VideoList({ queue }) {
+export default function VideoList({ queue, filter = "" }) {
   const { data, loading, error } = useSubscription(GET_VIDEOS);
   const [deleteVideo] = useMutation(DELETE_VIDEO);
   const apolloClient = useApolloClient();
@@ -98,14 +99,27 @@ export default function VideoList({ queue }) {
     setPendingDeleteId(null);
   };
 
+  const query = filter.trim().toLowerCase();
+  const matchesFilter = (v) =>
+    !query ||
+    v.title?.toLowerCase().includes(query) ||
+    v.artist?.toLowerCase().includes(query);
+
+  const hasResults = data.videos.some(matchesFilter);
+
   return (
     <>
       <Grid container spacing={3}>
         {data.videos.map((video) => (
-          <Grid item xs={12} sm={6} md={4} key={video.id}>
+          <Grid item xs={12} sm={6} md={4} key={video.id} sx={{ display: matchesFilter(video) ? undefined : "none" }}>
             <Video video={video} handleDeleteVideo={handleDeleteVideo} queue={queue} allVideos={data.videos} />
           </Grid>
         ))}
+        {query && !hasResults && (
+          <Grid item xs={12}>
+            <Typography color="text.secondary">No videos match "{filter.trim()}"</Typography>
+          </Grid>
+        )}
       </Grid>
 
       <Dialog open={!!pendingDeleteId} onClose={handleCancelDelete} PaperProps={{ sx: { minWidth: 320 } }}>

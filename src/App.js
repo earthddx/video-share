@@ -11,8 +11,11 @@ import {
   DialogTitle,
   DialogContent,
   Typography,
+  TextField,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
-import { QueueMusic } from "@mui/icons-material";
+import { QueueMusic, Search, Clear } from "@mui/icons-material";
 import { useQuery } from "@apollo/client";
 import { createAppTheme } from "./theme";
 import Header from "./components/Header";
@@ -31,6 +34,7 @@ function AppInner() {
   const [state, dispatch] = useReducer(videoReducer, context);
   const greaterThanMd = useMediaQuery((theme) => theme.breakpoints.up("md"));
   const [mobileQueueOpen, setMobileQueueOpen] = useState(false);
+  const [filter, setFilter] = useState("");
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [fabPos, setFabPos] = useState(() => {
     try { return JSON.parse(localStorage.getItem("fabPos")); } catch { return null; }
@@ -136,11 +140,63 @@ function AppInner() {
       >
         {greaterThanMd && (
           <Grid item md={3}>
+            <Box sx={{ px: 2, pt: 1, pb: 1 }}>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="Filter by title or artist…"
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Search fontSize="small" sx={{ color: "text.disabled" }} />
+                      </InputAdornment>
+                    ),
+                    endAdornment: filter && (
+                      <InputAdornment position="end">
+                        <IconButton size="small" onClick={() => setFilter("")}>
+                          <Clear fontSize="small" />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+              />
+            </Box>
             <QueuedVideoList queue={queue} />
           </Grid>
         )}
         <Grid item xs={12} md={9}>
-          <VideoList queue={queue} />
+          {!greaterThanMd && (
+            <Box sx={{ px: 1, pt: 1, pb: 1 }}>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="Filter by title or artist…"
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Search fontSize="small" sx={{ color: "text.disabled" }} />
+                      </InputAdornment>
+                    ),
+                    endAdornment: filter && (
+                      <InputAdornment position="end">
+                        <IconButton size="small" onClick={() => setFilter("")}>
+                          <Clear fontSize="small" />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+              />
+            </Box>
+          )}
+          <VideoList queue={queue} filter={filter} />
         </Grid>
       </Grid>
 
