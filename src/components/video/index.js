@@ -412,6 +412,7 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
         </Box>
 
         <VideoInfoRow
+          videoId={video.id}
           title={title}
           artist={artist}
           hovered={hovered}

@@ -43,3 +43,15 @@ export const DELETE_VIDEO = gql`
     }
   }
 `;
+
+export const UPDATE_VIDEO = gql`
+  mutation updateVideo($id: uuid!, $title: String!, $artist: String!) {
+    update_videos(where: { id: { _eq: $id } }, _set: { title: $title, artist: $artist }) {
+      returning {
+        id
+        title
+        artist
+      }
+    }
+  }
+`;
