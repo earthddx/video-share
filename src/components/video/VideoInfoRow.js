@@ -58,50 +58,52 @@ export default function VideoInfoRow({
 
   return (
     <Box
-      sx={{ display: "flex", alignItems: "flex-start", pt: 1.5, px: 1.5, pb: 1.5, minHeight: 96 }}
+      sx={{ position: "relative", pt: 1.5, px: 1.5, pb: 1.5, minHeight: 96 }}
       onClick={isEditing ? (e) => e.stopPropagation() : undefined}
     >
       {isEditing ? (
         <>
-          <Box sx={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 0.75 }}>
-            <TextField
-              size="small"
-              value={editTitle}
-              onChange={(e) => setEditTitle(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Title"
-              autoFocus
-              fullWidth
-              inputProps={{ style: { fontSize: 14, fontWeight: 600, paddingTop: 4, paddingBottom: 4 } }}
-            />
-            <TextField
-              size="small"
-              value={editArtist}
-              onChange={(e) => setEditArtist(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Artist"
-              fullWidth
-              inputProps={{ style: { fontSize: 13, paddingTop: 4, paddingBottom: 4 } }}
-            />
-          </Box>
-          <Box sx={{ display: "flex", flexDirection: "column", ml: 0.5 }}>
-            <Tooltip title="Save">
-              <span>
-                <IconButton size="small" onClick={handleSave} disabled={loading || !editTitle.trim()}>
-                  <Save sx={{ fontSize: 16, color: "primary.main" }} />
+          <Box sx={{ display: "flex", alignItems: "flex-start" }}>
+            <Box sx={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 0.75 }}>
+              <TextField
+                size="small"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Title"
+                autoFocus
+                fullWidth
+                inputProps={{ style: { fontSize: 14, fontWeight: 600, paddingTop: 4, paddingBottom: 4 } }}
+              />
+              <TextField
+                size="small"
+                value={editArtist}
+                onChange={(e) => setEditArtist(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Artist"
+                fullWidth
+                inputProps={{ style: { fontSize: 13, paddingTop: 4, paddingBottom: 4 } }}
+              />
+            </Box>
+            <Box sx={{ display: "flex", flexDirection: "column", ml: 0.5 }}>
+              <Tooltip title="Save">
+                <span>
+                  <IconButton size="small" onClick={handleSave} disabled={loading || !editTitle.trim()}>
+                    <Save sx={{ fontSize: 16, color: "primary.main" }} />
+                  </IconButton>
+                </span>
+              </Tooltip>
+              <Tooltip title="Cancel">
+                <IconButton size="small" onClick={handleCancel}>
+                  <Close sx={{ fontSize: 16 }} />
                 </IconButton>
-              </span>
-            </Tooltip>
-            <Tooltip title="Cancel">
-              <IconButton size="small" onClick={handleCancel}>
-                <Close sx={{ fontSize: 16 }} />
-              </IconButton>
-            </Tooltip>
+              </Tooltip>
+            </Box>
           </Box>
         </>
       ) : (
         <>
-          <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Box sx={{ minWidth: 0 }}>
             <MarqueeText typographyProps={{ variant: "body1", fontWeight: 600, sx: { lineHeight: 1.4 } }}>
               {title}
             </MarqueeText>
@@ -110,47 +112,47 @@ export default function VideoInfoRow({
             </MarqueeText>
           </Box>
 
-          <Tooltip title="Edit title & artist">
-            <IconButton
-              size="small"
-              onClick={handleEdit}
-              sx={{ mt: "-2px", ml: 0.5, opacity: hovered ? 1 : 0, transition: "opacity 0.2s" }}
-            >
-              <Edit sx={{ fontSize: 16, color: "grey.400" }} />
-            </IconButton>
-          </Tooltip>
-
-          <Tooltip title={currVideoInQueue ? "In queue" : "Add to queue"}>
-            <span>
-              <IconButton
-                size="small"
-                onClick={onAddToQueue}
-                disabled={currVideoInQueue}
-                sx={{
-                  mt: "-2px",
-                  ml: 0.5,
-                  opacity: hovered || currVideoInQueue ? 1 : 0,
-                  transition: "opacity 0.2s",
-                }}
-              >
-                {currVideoInQueue ? (
-                  <Check sx={{ fontSize: 16, color: "grey.500" }} />
-                ) : (
-                  <Queue sx={{ fontSize: 16, color: "grey.400" }} />
-                )}
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: 12,
+              right: 12,
+              display: "flex",
+              gap: 0.5,
+              opacity: hovered ? 1 : 0,
+              transition: "opacity 0.2s",
+              pointerEvents: hovered ? "auto" : "none",
+            }}
+          >
+            <Tooltip title="Edit title & artist">
+              <IconButton size="small" onClick={handleEdit}>
+                <Edit sx={{ fontSize: 16, color: "grey.400" }} />
               </IconButton>
-            </span>
-          </Tooltip>
+            </Tooltip>
 
-          <Tooltip title="Copy link">
-            <IconButton
-              size="small"
-              onClick={onShare}
-              sx={{ mt: "-2px", ml: 0.5, opacity: hovered ? 1 : 0, transition: "opacity 0.2s" }}
-            >
-              <Share sx={{ fontSize: 16, color: "grey.400" }} />
-            </IconButton>
-          </Tooltip>
+            <Tooltip title={currVideoInQueue ? "In queue" : "Add to queue"}>
+              <span>
+                <IconButton
+                  size="small"
+                  onClick={onAddToQueue}
+                  disabled={currVideoInQueue}
+                  sx={{ opacity: currVideoInQueue ? 1 : 0.7 }}
+                >
+                  {currVideoInQueue ? (
+                    <Check sx={{ fontSize: 16, color: "grey.500" }} />
+                  ) : (
+                    <Queue sx={{ fontSize: 16, color: "grey.400" }} />
+                  )}
+                </IconButton>
+              </span>
+            </Tooltip>
+
+            <Tooltip title="Copy link">
+              <IconButton size="small" onClick={onShare}>
+                <Share sx={{ fontSize: 16, color: "grey.400" }} />
+              </IconButton>
+            </Tooltip>
+          </Box>
         </>
       )}
     </Box>
