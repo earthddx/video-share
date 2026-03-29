@@ -67,9 +67,7 @@ export default function MiniPlayer({ queue }) {
   const handleScrollToVideo = () => {
     const el = document.querySelector(`[data-video-id="${video.id}"]`);
     el?.scrollIntoView({ behavior: "smooth", block: "center" });
-    setTimeout(() => {
-      window.dispatchEvent(new CustomEvent("highlightVideo", { detail: { id: video.id } }));
-    }, 300);
+    window.dispatchEvent(new CustomEvent("highlightVideo", { detail: { id: video.id } }));
   };
 
   return (
@@ -84,6 +82,8 @@ export default function MiniPlayer({ queue }) {
         bgcolor: "background.paper",
         borderRadius: 2,
         boxShadow: 8,
+        border: "1px solid",
+        borderColor: "divider",
         overflow: "hidden",
       }}
     >

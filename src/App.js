@@ -159,7 +159,7 @@ function AppInner() {
         sx={{
           pt: "calc(64px + 16px)",
           px: { xs: 1, sm: 2 },
-          pb: hasMiniPlayer ? "100px" : 0,
+          pb: hasMiniPlayer ? "120px" : 0,
         }}
       >
         {greaterThanMd && (
