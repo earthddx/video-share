@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { IconButton, Tooltip, Box, TextField } from "@mui/material";
+import { IconButton, Tooltip, Box, TextField, Divider } from "@mui/material";
 import MarqueeText from "../MarqueeText";
-import { Queue, Check, Share, Edit, Save, Close } from "@mui/icons-material";
+import { Queue, Check, Share, Edit, Save, Close, DeleteOutline } from "@mui/icons-material";
 import { useMutation } from "@apollo/client";
 import { UPDATE_VIDEO } from "../../graphql/mutations";
 
@@ -13,6 +13,7 @@ export default function VideoInfoRow({
   currVideoInQueue,
   onAddToQueue,
   onShare,
+  onDelete,
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(title);
@@ -150,6 +151,14 @@ export default function VideoInfoRow({
             <Tooltip title="Copy link">
               <IconButton size="small" onClick={onShare}>
                 <Share sx={{ fontSize: 16, color: "grey.400" }} />
+              </IconButton>
+            </Tooltip>
+
+            <Divider orientation="vertical" flexItem sx={{ mx: 0.5, opacity: 0.4 }} />
+
+            <Tooltip title="Delete">
+              <IconButton size="small" onClick={(e) => { e.stopPropagation(); onDelete(); }}>
+                <DeleteOutline sx={{ fontSize: 16, color: "error.main" }} />
               </IconButton>
             </Tooltip>
           </Box>

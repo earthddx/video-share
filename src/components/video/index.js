@@ -8,7 +8,6 @@ import {
 } from "@mui/material";
 import {
   PlayArrow,
-  Cancel,
   Fullscreen,
   Close,
 } from "@mui/icons-material";
@@ -345,23 +344,6 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
             </Box>
           )}
 
-          {/* Delete button — top-right */}
-          <IconButton
-            onClick={() => handleDeleteVideo(video.id)}
-            size="small"
-            sx={{
-              position: "absolute",
-              top: 4,
-              right: 4,
-              opacity: hovered ? 1 : 0,
-              transition: "opacity 0.2s",
-              bgcolor: "rgba(0,0,0,0.5)",
-              "&:hover": { bgcolor: "rgba(0,0,0,0.85)" },
-            }}
-          >
-            <Cancel sx={{ fontSize: 18, color: "white" }} />
-          </IconButton>
-
           {/* Inline controls overlay */}
           {isCurrentVideo && !state.isVideoExpanded && (
             <Box
@@ -419,6 +401,7 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
           currVideoInQueue={currVideoInQueue}
           onAddToQueue={handleAddToQueue}
           onShare={handleShare}
+          onDelete={() => handleDeleteVideo(video.id)}
         />
       </Box>
 
