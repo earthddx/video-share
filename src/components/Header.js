@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -6,23 +6,14 @@ import {
   Grid,
   useMediaQuery,
   Button,
-  IconButton,
-  Tooltip,
 } from "@mui/material";
-import {
-  YouTube,
-  InfoOutlined,
-  LightMode,
-  DarkMode,
-} from "@mui/icons-material";
+import { YouTube, InfoOutlined } from "@mui/icons-material";
 import AddVideo from "./add-video";
 import AboutDialog from "./AboutDialog";
-import { ThemeContext } from "../store/ThemeContext";
 
 export default function Header() {
   const greaterThanMd = useMediaQuery((theme) => theme.breakpoints.up("md"));
   const [aboutOpen, setAboutOpen] = useState(false);
-  const { mode, toggleTheme } = useContext(ThemeContext);
 
   return (
     <AppBar position="fixed" color="secondary">
@@ -68,15 +59,6 @@ export default function Header() {
               About
             </Button>
           )}
-          <Tooltip title={mode === "dark" ? "Light mode" : "Dark mode"}>
-            <IconButton color="inherit" onClick={toggleTheme} size="small">
-              {mode === "dark" ? (
-                <LightMode fontSize="small" />
-              ) : (
-                <DarkMode fontSize="small" />
-              )}
-            </IconButton>
-          </Tooltip>
         </Grid>
       </Grid>
       <AboutDialog open={aboutOpen} onClose={() => setAboutOpen(false)} />

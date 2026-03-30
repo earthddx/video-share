@@ -32,7 +32,6 @@ import MiniPlayer from "./components/miniplayer";
 import videoReducer from "./store/reducer";
 import { GET_QUEUED_VIDEOS } from "./graphql/queries";
 import { VideoContext } from "./store/VideoContext";
-import { ThemeContext } from "./store/ThemeContext";
 
 // Inner component — rendered inside ThemeProvider so useMediaQuery can read the theme
 function AppInner() {
@@ -252,25 +251,15 @@ function AppInner() {
   );
 }
 
-// Outer wrapper — owns theme state and provides ThemeProvider
-export default function App() {
-  const [mode, setMode] = useState(
-    () => localStorage.getItem("themeMode") || "dark",
-  );
-  const theme = useMemo(() => createAppTheme(mode), [mode]);
+const darkTheme = createAppTheme();
 
-  const toggleTheme = () => {
-    const next = mode === "dark" ? "light" : "dark";
-    setMode(next);
-    localStorage.setItem("themeMode", next);
-  };
+// Outer wrapper — provides ThemeProvider
+export default function App() {
 
   return (
-    <ThemeContext.Provider value={{ mode, toggleTheme }}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <AppInner />
-      </ThemeProvider>
-    </ThemeContext.Provider>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <AppInner />
+    </ThemeProvider>
   );
 }
