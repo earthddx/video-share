@@ -4,7 +4,8 @@
       "Bash(git mv:*)",
       "Bash(find d:Projectsmusic-share -maxdepth 2 -type f \\\\\\(-name *.env* -o -name *.config.* -o -name *.graphql \\\\\\))",
       "Bash(npx react-scripts:*)",
-      "WebFetch(domain:mui.com)"
+      "WebFetch(domain:mui.com)",
+      "Bash(ls -la /d/Projects/music-share/src/*.css /d/Projects/music-share/src/*.scss)"
     ]
   }
 }

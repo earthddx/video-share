@@ -104,7 +104,7 @@ function AppInner() {
         }}
       >
         {greaterThanMd && (
-          <Grid item md={3}>
+          <Grid item md={3} sx={{ position: "sticky", top: "calc(64px + 16px)", alignSelf: "flex-start", maxHeight: "calc(100vh - 64px - 16px)", overflowY: "auto" }}>
             <Box sx={{ px: 2, pt: 1, pb: 1 }}>
               <TextField
                 fullWidth
