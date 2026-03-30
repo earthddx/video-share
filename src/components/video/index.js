@@ -111,7 +111,7 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
           ...(highlighted && { animation: "videoHighlight 3.2s ease-in-out" }),
         }}
       >
-        <Box sx={{ position: "relative", aspectRatio: "16/9", width: "100%", bgcolor: "black", borderRadius: 2, overflow: "hidden" }}>
+        <Box sx={{ position: "relative", aspectRatio: "16/9", width: "100%", bgcolor: "black", borderRadius: '10px', overflow: "hidden" }}>
           {isCurrentVideo ? (
             <ActivePlayer
               video={video}
