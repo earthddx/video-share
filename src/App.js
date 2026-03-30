@@ -25,6 +25,7 @@ import { QueueMusic, Search, Clear } from "@mui/icons-material";
 import { useQuery } from "@apollo/client";
 import { createAppTheme } from "./theme";
 import Header from "./components/Header";
+import BackgroundArt from "./components/BackgroundArt";
 import VideoList from "./components/video/VideoList";
 import QueuedVideoList from "./components/queue/QueuedVideoList";
 import MiniPlayer from "./components/miniplayer";
@@ -94,6 +95,7 @@ function AppInner() {
 
   return (
     <VideoContext.Provider value={{ state, dispatch }}>
+      <BackgroundArt />
       <Header />
       <Grid
         container
