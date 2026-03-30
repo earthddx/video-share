@@ -109,7 +109,7 @@ export default function VideoList({ queue, filter = "" }) {
 
   return (
     <>
-      <Grid container spacing={3}>
+      <Grid container rowSpacing={1} columnSpacing={3}>
         {data.videos.map((video) => (
           <Grid item xs={12} sm={6} md={4} key={video.id} sx={{ display: matchesFilter(video) ? undefined : "none" }}>
             <Video video={video} handleDeleteVideo={handleDeleteVideo} queue={queue} allVideos={data.videos} />

@@ -95,6 +95,8 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
           cursor: "pointer",
           borderRadius: 2,
           overflow: "hidden",
+          px: 1,
+          pt: 1,
           transition: "background-color 0.2s",
           "&:hover": {
             bgcolor: (theme) =>
@@ -109,7 +111,7 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
           ...(highlighted && { animation: "videoHighlight 3.2s ease-in-out" }),
         }}
       >
-        <Box sx={{ position: "relative", aspectRatio: "16/9", width: "100%", bgcolor: "black" }}>
+        <Box sx={{ position: "relative", aspectRatio: "16/9", width: "100%", bgcolor: "black", borderRadius: 2, overflow: "hidden" }}>
           {isCurrentVideo ? (
             <ActivePlayer
               video={video}
