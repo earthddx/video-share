@@ -103,15 +103,17 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos, view
           alignItems: isListMode ? "center" : undefined,
           gap: isListMode ? 1.5 : undefined,
           transition: "background-color 0.2s",
+          ...(isCurrentVideo && { bgcolor: "rgba(239,83,80,0.08)" }),
           "&:hover": {
-            bgcolor: (theme) =>
-              theme.palette.mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)",
+            bgcolor: isCurrentVideo
+              ? "rgba(239,83,80,0.14)"
+              : (theme) => theme.palette.mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)",
           },
           "@keyframes videoHighlight": {
             "0%": { backgroundColor: "transparent", boxShadow: "0 0 0 0px rgba(239,83,80,0)" },
             "25%": { backgroundColor: "rgba(239,83,80,0.13)", boxShadow: "0 0 0 2px rgba(239,83,80,0.7)" },
             "50%": { backgroundColor: "rgba(239,83,80,0.10)", boxShadow: "0 0 0 2px rgba(239,83,80,0.5)" },
-            "100%": { backgroundColor: "transparent", boxShadow: "0 0 0 0px rgba(239,83,80,0)" },
+            "100%": { backgroundColor: isCurrentVideo ? "rgba(239,83,80,0.08)" : "transparent", boxShadow: "0 0 0 0px rgba(239,83,80,0)" },
           },
           ...(highlighted && { animation: "videoHighlight 3.2s ease-in-out" }),
         }}
