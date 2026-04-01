@@ -17,7 +17,7 @@ export function usePlayback({ isCurrentVideo, state, dispatch, video, queue, pos
   const handleVideoEnd = useCallback(() => {
     if (!isCurrentVideo || repeatVideo || hasAdvancedRef.current) return;
     hasAdvancedRef.current = true;
-    const nextInQueue = queue[positionInQueue + 1];
+    const nextInQueue = positionInQueue >= 0 ? queue[positionInQueue + 1] : undefined;
     if (nextInQueue) {
       setPlayed(0);
       dispatch({ type: "SET_VIDEO", payload: { video: nextInQueue } });
