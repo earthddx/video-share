@@ -1,6 +1,8 @@
 import {
   useContext,
+  useLayoutEffect,
   useReducer,
+  useRef,
   useState,
   useMemo,
   useEffect,
@@ -47,6 +49,31 @@ function AppInner() {
   const [viewMode, setViewMode] = useState("tiles");
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const scrollRestoreRef = useRef(null);
+
+  useLayoutEffect(() => {
+    if (scrollRestoreRef.current !== null) {
+      const { videoId, offsetFromTop } = scrollRestoreRef.current;
+      const el = document.querySelector(`[data-video-id="${videoId}"]`);
+      if (el) {
+        const newScrollY = el.getBoundingClientRect().top + window.scrollY - offsetFromTop;
+        window.scrollTo(0, newScrollY);
+      }
+      scrollRestoreRef.current = null;
+    }
+  }, [sidebarOpen]);
+
+  const toggleSidebar = (value) => {
+    const elements = document.querySelectorAll("[data-video-id]");
+    for (const el of elements) {
+      const rect = el.getBoundingClientRect();
+      if (rect.bottom > 100) {
+        scrollRestoreRef.current = { videoId: el.dataset.videoId, offsetFromTop: rect.top };
+        break;
+      }
+    }
+    setSidebarOpen(value);
+  };
   const handleFabClick = () => setMobileQueueOpen(true);
   const queue = useMemo(() => data?.queue ?? [], [data?.queue]);
 
@@ -105,7 +132,7 @@ function AppInner() {
         <Tooltip title="Show sidebar" placement="right">
           <IconButton
             size="small"
-            onClick={() => setSidebarOpen(true)}
+            onClick={() => toggleSidebar(true)}
             sx={{ position: "fixed", top: 76, left: 12, zIndex: 1100, border: "1px solid", borderColor: "divider", borderRadius: 1 }}
           >
             <MenuIcon sx={{ fontSize: 18 }} />
@@ -124,7 +151,7 @@ function AppInner() {
           <Grid item md={3} sx={{ position: "sticky", top: "calc(64px + 16px)", alignSelf: "flex-start", maxHeight: "calc(100vh - 64px - 16px)", overflowY: "auto" }}>
             <Box sx={{ px: 2, pt: 1, pb: 1, display: "flex", alignItems: "center", gap: 1 }}>
               <Tooltip title="Hide sidebar" placement="right">
-                <IconButton size="small" onClick={() => setSidebarOpen(false)} sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1, flexShrink: 0 }}>
+                <IconButton size="small" onClick={() => toggleSidebar(false)} sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1, flexShrink: 0 }}>
                   <MenuOpen sx={{ fontSize: 18 }} />
                 </IconButton>
               </Tooltip>
