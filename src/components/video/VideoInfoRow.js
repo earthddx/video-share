@@ -14,6 +14,7 @@ export default function VideoInfoRow({
   onAddToQueue,
   onShare,
   onDelete,
+  compact = false,
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(title);
@@ -59,7 +60,7 @@ export default function VideoInfoRow({
 
   return (
     <Box
-      sx={{ position: "relative", pt: 1.5, px: 1.5, pb: 1.5, minHeight: 96 }}
+      sx={{ position: "relative", pt: compact ? 0.5 : 1.5, px: 1.5, pb: compact ? 0.5 : 1.5, minHeight: compact ? 0 : 96, flex: compact ? 1 : undefined, minWidth: 0 }}
       onClick={isEditing ? (e) => e.stopPropagation() : undefined}
     >
       {isEditing ? (

@@ -20,8 +20,10 @@ import {
   TextField,
   InputAdornment,
   IconButton,
+  ToggleButton,
+  ToggleButtonGroup,
 } from "@mui/material";
-import { QueueMusic, Search, Clear } from "@mui/icons-material";
+import { QueueMusic, Search, Clear, GridView, ViewList } from "@mui/icons-material";
 import { useQuery } from "@apollo/client";
 import { createAppTheme } from "./theme";
 import Header from "./components/Header";
@@ -41,6 +43,7 @@ function AppInner() {
   const greaterThanMd = useMediaQuery((theme) => theme.breakpoints.up("md"));
   const [mobileQueueOpen, setMobileQueueOpen] = useState(false);
   const [filter, setFilter] = useState("");
+  const [viewMode, setViewMode] = useState("tiles");
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const handleFabClick = () => setMobileQueueOpen(true);
   const queue = useMemo(() => data?.queue ?? [], [data?.queue]);
@@ -134,7 +137,7 @@ function AppInner() {
         )}
         <Grid item xs={12} md={9}>
           {!greaterThanMd && (
-            <Box sx={{ px: 1, pt: 1, pb: 1 }}>
+            <Box sx={{ px: 1, pt: 1, pb: 1, display: "flex", gap: 1, alignItems: "center" }}>
               <TextField
                 fullWidth
                 size="small"
@@ -156,9 +159,31 @@ function AppInner() {
                   ) : null,
                 }}
               />
+              <ToggleButtonGroup
+                value={viewMode}
+                exclusive
+                onChange={(_, v) => v && setViewMode(v)}
+                size="small"
+              >
+                <ToggleButton value="tiles"><GridView sx={{ fontSize: 18 }} /></ToggleButton>
+                <ToggleButton value="list"><ViewList sx={{ fontSize: 18 }} /></ToggleButton>
+              </ToggleButtonGroup>
             </Box>
           )}
-          <VideoList queue={queue} filter={filter} />
+          {greaterThanMd && (
+            <Box sx={{ position: "fixed", top: 72, right: 24, zIndex: 1100 }}>
+              <ToggleButtonGroup
+                value={viewMode}
+                exclusive
+                onChange={(_, v) => v && setViewMode(v)}
+                size="small"
+              >
+                <ToggleButton value="tiles"><GridView sx={{ fontSize: 18 }} /></ToggleButton>
+                <ToggleButton value="list"><ViewList sx={{ fontSize: 18 }} /></ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
+          )}
+          <VideoList queue={queue} filter={filter} viewMode={viewMode} />
         </Grid>
       </Grid>
 

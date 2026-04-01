@@ -8,7 +8,7 @@ import VideoThumbnailArea from "./VideoThumbnailArea";
 import ActivePlayer from "./ActivePlayer";
 import VideoInfoRow from "./VideoInfoRow";
 
-export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
+export default function Video({ video, handleDeleteVideo, queue, allVideos, viewMode = "tiles" }) {
   const { artist, title, thumbnail } = video;
   const { state, dispatch } = useContext(VideoContext);
   const isCurrentVideo = !!state.video.id && video.id === state.video.id;
@@ -84,6 +84,7 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
   };
 
   const showControls = isCurrentVideo && !state.isVideoExpanded && (hovered || !state.isPlaying);
+  const isListMode = viewMode === "list";
 
   return (
     <>
@@ -96,7 +97,11 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
           borderRadius: 2,
           overflow: "hidden",
           px: 1,
-          pt: 1,
+          pt: isListMode ? 0.5 : 1,
+          pb: isListMode ? 0.5 : 0,
+          display: isListMode ? "flex" : "block",
+          alignItems: isListMode ? "center" : undefined,
+          gap: isListMode ? 1.5 : undefined,
           transition: "background-color 0.2s",
           "&:hover": {
             bgcolor: (theme) =>
@@ -111,7 +116,11 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
           ...(highlighted && { animation: "videoHighlight 3.2s ease-in-out" }),
         }}
       >
-        <Box sx={{ position: "relative", aspectRatio: "16/9", width: "100%", bgcolor: "black", borderRadius: '10px', overflow: "hidden" }}>
+        <Box sx={
+          isListMode
+            ? { position: "relative", width: 128, flexShrink: 0, aspectRatio: "16/9", bgcolor: "black", borderRadius: "8px", overflow: "hidden" }
+            : { position: "relative", aspectRatio: "16/9", width: "100%", bgcolor: "black", borderRadius: "10px", overflow: "hidden" }
+        }>
           {isCurrentVideo ? (
             <ActivePlayer
               video={video}
@@ -152,6 +161,7 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos }) {
           onAddToQueue={handleAddToQueue}
           onShare={handleShare}
           onDelete={() => handleDeleteVideo(video.id)}
+          compact={isListMode}
         />
       </Box>
 
