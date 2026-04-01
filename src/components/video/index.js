@@ -137,6 +137,7 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos, view
               onProgress={handleProgress}
               controlsProps={controlsProps}
               dispatch={dispatch}
+              listMode={isListMode}
             />
           ) : (
             <VideoThumbnailArea

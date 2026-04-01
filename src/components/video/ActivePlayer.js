@@ -1,5 +1,5 @@
-import { Box, IconButton, Tooltip } from "@mui/material";
-import { Close } from "@mui/icons-material";
+import { Box, CardMedia, IconButton, Tooltip } from "@mui/material";
+import { Close, Fullscreen, Pause, PlayArrow } from "@mui/icons-material";
 import ReactPlayer from "react-player";
 import PlayerControls from "./PlayerControls";
 
@@ -20,7 +20,32 @@ export default function ActivePlayer({
   onProgress,
   controlsProps,
   dispatch,
+  listMode = false,
 }) {
+  const sharedPlayerProps = {
+    ref: reactPlayerRef,
+    url: video.url,
+    playing: controlsProps.isPlaying,
+    volume,
+    playbackRate,
+    loop: repeatVideo,
+    playsinline: true,
+    width: "100%",
+    height: "100%",
+    style: { pointerEvents: "none" },
+    config: { youtube: { playerVars: { playsinline: 1 } } },
+    onReady: () => {
+      if (!hasRestoredSeek.current && initialSecondsRef.current > 0) {
+        reactPlayerRef.current?.seekTo(initialSecondsRef.current, "seconds");
+        hasRestoredSeek.current = true;
+      }
+    },
+    onEnded: onVideoEnd,
+    onProgress,
+  };
+
+  const audioOnly = listMode && !isVideoExpanded;
+
   return (
     <>
       {/* Fullscreen backdrop */}
@@ -32,7 +57,7 @@ export default function ActivePlayer({
       )}
 
       <Box
-        onClick={onTogglePlay}
+        onClick={audioOnly ? undefined : onTogglePlay}
         sx={
           isVideoExpanded
             ? {
@@ -48,43 +73,28 @@ export default function ActivePlayer({
             : { width: "100%", height: "100%" }
         }
       >
-        <ReactPlayer
-          ref={reactPlayerRef}
-          url={video.url}
-          playing={controlsProps.isPlaying}
-          volume={volume}
-          playbackRate={playbackRate}
-          loop={repeatVideo}
-          playsinline
-          width="100%"
-          height={isVideoExpanded ? `calc(100% - ${MODAL_CONTROLS_HEIGHT}px)` : "100%"}
-          style={{ pointerEvents: "none" }}
-          config={{ youtube: { playerVars: { playsinline: 1 } } }}
-          onReady={() => {
-            if (!hasRestoredSeek.current && initialSecondsRef.current > 0) {
-              reactPlayerRef.current?.seekTo(initialSecondsRef.current, "seconds");
-              hasRestoredSeek.current = true;
-            }
-          }}
-          onEnded={onVideoEnd}
-          onProgress={onProgress}
-        />
+        {/* ReactPlayer always mounted — preserves position across mode changes */}
+        <Box sx={audioOnly ? { position: "absolute", inset: 0, opacity: 0, pointerEvents: "none" } : { width: "100%", height: "100%" }}>
+          <ReactPlayer
+            {...sharedPlayerProps}
+            height={isVideoExpanded ? `calc(100% - ${MODAL_CONTROLS_HEIGHT}px)` : "100%"}
+          />
+        </Box>
+
+        {/* List mode: thumbnail covers the hidden video */}
+        {audioOnly && (
+          <CardMedia
+            component="img"
+            src={video.thumbnail}
+            sx={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        )}
 
         {/* Modal close button */}
         {isVideoExpanded && (
           <Box
             onClick={(e) => e.stopPropagation()}
-            sx={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              display: "flex",
-              justifyContent: "flex-end",
-              px: 1,
-              pt: 1,
-              zIndex: 1,
-            }}
+            sx={{ position: "absolute", top: 0, left: 0, right: 0, display: "flex", justifyContent: "flex-end", px: 1, pt: 1, zIndex: 1 }}
           >
             <Tooltip title="Close">
               <IconButton onClick={() => dispatch({ type: "COLLAPSE_VIDEO" })}>
@@ -98,45 +108,63 @@ export default function ActivePlayer({
         {isVideoExpanded && (
           <Box
             onClick={(e) => e.stopPropagation()}
-            sx={{
-              position: "absolute",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              px: 2,
-              pb: 1,
-              pt: 3,
-              background: "linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%)",
-            }}
+            sx={{ position: "absolute", bottom: 0, left: 0, right: 0, px: 2, pb: 1, pt: 3, background: "linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%)" }}
           >
             <PlayerControls {...controlsProps} />
           </Box>
         )}
       </Box>
 
-      {/* Inline controls overlay */}
-      {!isVideoExpanded && (
+      {/* Tiles mode: inline controls overlay */}
+      {!isVideoExpanded && !listMode && (
         <Box
           sx={{
             position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
+            bottom: 0, left: 0, right: 0,
             background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)",
-            px: 1,
-            pb: 0.5,
-            pt: 4,
+            px: 1, pb: 0.5, pt: 4,
             opacity: showControls ? 1 : 0,
             transition: "opacity 0.2s",
           }}
         >
-          <PlayerControls
-            {...controlsProps}
-            compact
-            showExpand
-            onExpand={() => dispatch({ type: "EXPAND_VIDEO" })}
-          />
+          <PlayerControls compact showExpand onExpand={() => dispatch({ type: "EXPAND_VIDEO" })} {...controlsProps} />
         </Box>
+      )}
+
+      {/* List mode: play/pause + expand overlays */}
+      {audioOnly && (
+        <>
+          <Box
+            onClick={onTogglePlay}
+            sx={{
+              position: "absolute", inset: 0,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              opacity: showControls ? 1 : 0,
+              transition: "opacity 0.2s",
+              cursor: "pointer",
+            }}
+          >
+            <IconButton sx={{ bgcolor: "rgba(0,0,0,0.6)", "&:hover": { bgcolor: "rgba(0,0,0,0.85)" }, width: 40, height: 40, pointerEvents: "none" }}>
+              {controlsProps.isPlaying
+                ? <Pause sx={{ color: "white", fontSize: 22 }} />
+                : <PlayArrow sx={{ color: "white", fontSize: 22 }} />}
+            </IconButton>
+          </Box>
+
+          <IconButton
+            onClick={(e) => { e.stopPropagation(); dispatch({ type: "EXPAND_VIDEO" }); }}
+            size="small"
+            sx={{
+              position: "absolute", bottom: 4, right: 4,
+              opacity: showControls ? 1 : 0,
+              transition: "opacity 0.2s",
+              bgcolor: "rgba(0,0,0,0.5)",
+              "&:hover": { bgcolor: "rgba(0,0,0,0.85)" },
+            }}
+          >
+            <Fullscreen sx={{ fontSize: 18, color: "white" }} />
+          </IconButton>
+        </>
       )}
     </>
   );
