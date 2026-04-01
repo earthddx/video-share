@@ -24,9 +24,8 @@ import {
   IconButton,
   ToggleButton,
   ToggleButtonGroup,
-  Tooltip,
 } from "@mui/material";
-import { QueueMusic, Search, Clear, GridView, ViewList, MenuOpen, Menu as MenuIcon } from "@mui/icons-material";
+import { QueueMusic, Search, Clear, GridView, ViewList } from "@mui/icons-material";
 import { useQuery } from "@apollo/client";
 import { createAppTheme } from "./theme";
 import Header from "./components/Header";
@@ -127,18 +126,7 @@ function AppInner() {
   return (
     <VideoContext.Provider value={{ state, dispatch }}>
       <BackgroundArt />
-      <Header />
-      {greaterThanMd && !sidebarOpen && (
-        <Tooltip title="Show sidebar" placement="right">
-          <IconButton
-            size="small"
-            onClick={() => toggleSidebar(true)}
-            sx={{ position: "fixed", top: 76, left: 12, zIndex: 1100, border: "1px solid", borderColor: "divider", borderRadius: 1 }}
-          >
-            <MenuIcon sx={{ fontSize: 18 }} />
-          </IconButton>
-        </Tooltip>
-      )}
+      <Header onToggleSidebar={() => toggleSidebar((v) => !v)} />
       <Grid
         container
         sx={{
@@ -149,12 +137,7 @@ function AppInner() {
       >
         {greaterThanMd && sidebarOpen && (
           <Grid item md={3} sx={{ position: "sticky", top: "calc(64px + 16px)", alignSelf: "flex-start", maxHeight: "calc(100vh - 64px - 16px)", overflowY: "auto" }}>
-            <Box sx={{ px: 2, pt: 1, pb: 1, display: "flex", alignItems: "center", gap: 1 }}>
-              <Tooltip title="Hide sidebar" placement="right">
-                <IconButton size="small" onClick={() => toggleSidebar(false)} sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1, flexShrink: 0 }}>
-                  <MenuOpen sx={{ fontSize: 18 }} />
-                </IconButton>
-              </Tooltip>
+            <Box sx={{ px: 2, pt: 1, pb: 1 }}>
               <TextField
                 fullWidth
                 size="small"
@@ -180,7 +163,7 @@ function AppInner() {
             <QueuedVideoList queue={queue} />
           </Grid>
         )}
-        <Grid item xs={12} md={greaterThanMd && sidebarOpen ? 9 : 12}>
+        <Grid item xs={12} md={greaterThanMd && sidebarOpen ? 9 : 12} sx={{ pt: greaterThanMd ? "44px" : 0 }}>
           {!greaterThanMd && (
             <Box sx={{ px: 1, pt: 1, pb: 1, display: "flex", gap: 1, alignItems: "center" }}>
               <TextField

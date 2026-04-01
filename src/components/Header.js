@@ -6,12 +6,14 @@ import {
   Grid,
   useMediaQuery,
   Button,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
-import { YouTube, InfoOutlined } from "@mui/icons-material";
+import { YouTube, InfoOutlined, Menu as MenuIcon } from "@mui/icons-material";
 import AddVideo from "./add-video";
 import AboutDialog from "./AboutDialog";
 
-export default function Header() {
+export default function Header({ onToggleSidebar }) {
   const greaterThanMd = useMediaQuery((theme) => theme.breakpoints.up("md"));
   const [aboutOpen, setAboutOpen] = useState(false);
 
@@ -20,7 +22,12 @@ export default function Header() {
       <Grid container alignItems="center" sx={{ minHeight: 64 }}>
         {greaterThanMd && (
           <Grid item md={2}>
-            <Toolbar>
+            <Toolbar sx={{ gap: 1 }}>
+              <Tooltip title="Toggle sidebar">
+                <IconButton size="small" onClick={onToggleSidebar} color="inherit">
+                  <MenuIcon />
+                </IconButton>
+              </Tooltip>
               <YouTube sx={{ fontSize: 36 }} color="primary" />
               <Typography
                 variant="h6"
