@@ -160,6 +160,8 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos, view
           title={title}
           artist={artist}
           hovered={hovered}
+          isCurrentVideo={isCurrentVideo}
+          isPlaying={state.isPlaying}
           currVideoInQueue={currVideoInQueue}
           onAddToQueue={handleAddToQueue}
           onShare={handleShare}

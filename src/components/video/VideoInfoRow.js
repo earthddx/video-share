@@ -10,6 +10,8 @@ export default function VideoInfoRow({
   title,
   artist,
   hovered,
+  isCurrentVideo,
+  isPlaying,
   currVideoInQueue,
   onAddToQueue,
   onShare,
@@ -111,8 +113,8 @@ export default function VideoInfoRow({
               <MarqueeText typographyProps={{ variant: "body1", fontWeight: 600, sx: { lineHeight: 1.4 } }}>
                 {title}
               </MarqueeText>
-              <MarqueeText typographyProps={{ variant: "body2", color: "text.secondary" }}>
-                {artist}
+              <MarqueeText typographyProps={{ variant: "body2", color: isCurrentVideo ? "primary.main" : "text.secondary", sx: { fontWeight: isCurrentVideo ? 600 : 400 } }}>
+                {isCurrentVideo ? `${isPlaying ? "Now playing" : "Paused"} · ${artist}` : artist}
               </MarqueeText>
             </Box>
 
