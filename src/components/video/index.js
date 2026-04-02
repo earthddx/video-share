@@ -35,6 +35,12 @@ export default function Video({ video, handleDeleteVideo, queue, allVideos, view
 
   const handleTogglePlay = () => {
     if (isCurrentVideo) {
+      if (!state.isPlaying) {
+        // On mobile, YouTube blocks playVideo() called outside a user gesture context.
+        // Clicking the iframe synchronously here satisfies the browser's gesture requirement.
+        const iframe = reactPlayerRef.current?.getInternalPlayer()?.getIframe?.();
+        iframe?.click();
+      }
       dispatch(state.isPlaying ? { type: "PAUSE_VIDEO" } : { type: "PLAY_VIDEO" });
     } else {
       dispatch({ type: "SET_VIDEO", payload: { video } });
