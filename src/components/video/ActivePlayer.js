@@ -41,7 +41,8 @@ export default function ActivePlayer({
     playsinline: true,
     width: "100%",
     height: "100%",
-    style: { pointerEvents: hasStarted ? "none" : "auto" },
+    muted: !hasStarted,
+    style: { pointerEvents: "none" },
     config: { youtube: { playerVars: { playsinline: 1 } } },
     onReady: () => {
       if (!hasRestoredSeek.current) {
