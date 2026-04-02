@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { IconButton, Tooltip, Box, TextField, Divider } from "@mui/material";
+import { IconButton, Tooltip, Box, TextField, Menu, MenuItem, ListItemIcon, ListItemText, Divider } from "@mui/material";
 import MarqueeText from "../MarqueeText";
-import { Queue, Check, Share, Edit, Save, Close, DeleteOutline } from "@mui/icons-material";
+import { Queue, Check, Share, Edit, Save, Close, DeleteOutline, MoreVert } from "@mui/icons-material";
 import { useMutation } from "@apollo/client";
 import { UPDATE_VIDEO } from "../../graphql/mutations";
 
@@ -19,6 +19,7 @@ export default function VideoInfoRow({
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(title);
   const [editArtist, setEditArtist] = useState(artist);
+  const [menuAnchor, setMenuAnchor] = useState(null);
 
   const [updateVideo, { loading }] = useMutation(UPDATE_VIDEO, {
     update(cache, { data }) {
@@ -60,7 +61,7 @@ export default function VideoInfoRow({
 
   return (
     <Box
-      sx={{ position: "relative", pt: compact ? 0.5 : 1.5, px: 1.5, pb: compact ? 0.5 : 1.5, minHeight: compact ? 0 : 96, flex: compact ? 1 : undefined, minWidth: 0 }}
+      sx={{ pt: compact ? 0.5 : 1.5, px: 1.5, pb: compact ? 0.5 : 1.5, flex: compact ? 1 : undefined, minWidth: 0 }}
       onClick={isEditing ? (e) => e.stopPropagation() : undefined}
     >
       {isEditing ? (
@@ -105,64 +106,65 @@ export default function VideoInfoRow({
         </>
       ) : (
         <>
-          <Box sx={{ minWidth: 0 }}>
-            <MarqueeText typographyProps={{ variant: "body1", fontWeight: 600, sx: { lineHeight: 1.4 } }}>
-              {title}
-            </MarqueeText>
-            <MarqueeText typographyProps={{ variant: "body2", color: "text.secondary" }}>
-              {artist}
-            </MarqueeText>
-          </Box>
+          <Box sx={{ display: "flex", alignItems: "center", minWidth: 0 }}>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <MarqueeText typographyProps={{ variant: "body1", fontWeight: 600, sx: { lineHeight: 1.4 } }}>
+                {title}
+              </MarqueeText>
+              <MarqueeText typographyProps={{ variant: "body2", color: "text.secondary" }}>
+                {artist}
+              </MarqueeText>
+            </Box>
 
-          <Box
-            sx={{
-              position: "absolute",
-              bottom: 12,
-              right: 12,
-              display: "flex",
-              gap: 0.5,
-              opacity: hovered ? 1 : 0,
-              transition: "opacity 0.2s",
-              pointerEvents: hovered ? "auto" : "none",
-            }}
-          >
-            <Tooltip title="Edit title & artist">
-              <IconButton size="small" onClick={handleEdit}>
-                <Edit sx={{ fontSize: 16, color: "grey.400" }} />
-              </IconButton>
-            </Tooltip>
-
-            <Tooltip title={currVideoInQueue ? "In queue" : "Add to queue"}>
-              <span>
-                <IconButton
-                  size="small"
-                  onClick={onAddToQueue}
-                  disabled={currVideoInQueue}
-                  sx={{ opacity: currVideoInQueue ? 1 : 0.7 }}
-                >
-                  {currVideoInQueue ? (
-                    <Check sx={{ fontSize: 16, color: "grey.500" }} />
-                  ) : (
-                    <Queue sx={{ fontSize: 16, color: "grey.400" }} />
-                  )}
+            <Box
+              sx={{
+                ml: 0.5,
+                flexShrink: 0,
+                opacity: hovered ? 1 : 0,
+                transition: "opacity 0.2s",
+                pointerEvents: hovered ? "auto" : "none",
+              }}
+            >
+              <Tooltip title="More options">
+                <IconButton size="small" onClick={(e) => { e.stopPropagation(); setMenuAnchor(e.currentTarget); }}>
+                  <MoreVert sx={{ fontSize: 18, color: "grey.400" }} />
                 </IconButton>
-              </span>
-            </Tooltip>
-
-            <Tooltip title="Copy link">
-              <IconButton size="small" onClick={onShare}>
-                <Share sx={{ fontSize: 16, color: "grey.400" }} />
-              </IconButton>
-            </Tooltip>
-
-            <Divider orientation="vertical" flexItem sx={{ mx: 0.5, opacity: 0.4 }} />
-
-            <Tooltip title="Delete">
-              <IconButton size="small" onClick={(e) => { e.stopPropagation(); onDelete(); }}>
-                <DeleteOutline sx={{ fontSize: 16, color: "error.main" }} />
-              </IconButton>
-            </Tooltip>
+              </Tooltip>
+            </Box>
           </Box>
+
+          <Menu
+              anchorEl={menuAnchor}
+              open={Boolean(menuAnchor)}
+              disableScrollLock
+              onClose={(e) => { e?.stopPropagation?.(); setMenuAnchor(null); }}
+              onClick={(e) => e.stopPropagation()}
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+              transformOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+              <MenuItem onClick={(e) => { setMenuAnchor(null); handleEdit(e); }}>
+                <ListItemIcon><Edit fontSize="small" /></ListItemIcon>
+                <ListItemText>Edit title &amp; artist</ListItemText>
+              </MenuItem>
+              <MenuItem
+                onClick={(e) => { e.stopPropagation(); setMenuAnchor(null); onAddToQueue(e); }}
+                disabled={currVideoInQueue}
+              >
+                <ListItemIcon>
+                  {currVideoInQueue ? <Check fontSize="small" /> : <Queue fontSize="small" />}
+                </ListItemIcon>
+                <ListItemText>{currVideoInQueue ? "In queue" : "Add to queue"}</ListItemText>
+              </MenuItem>
+              <MenuItem onClick={(e) => { e.stopPropagation(); setMenuAnchor(null); onShare(e); }}>
+                <ListItemIcon><Share fontSize="small" /></ListItemIcon>
+                <ListItemText>Copy link</ListItemText>
+              </MenuItem>
+              <Divider />
+              <MenuItem onClick={(e) => { e.stopPropagation(); setMenuAnchor(null); onDelete(); }} sx={{ color: "error.main" }}>
+                <ListItemIcon><DeleteOutline fontSize="small" color="error" /></ListItemIcon>
+                <ListItemText>Delete</ListItemText>
+              </MenuItem>
+            </Menu>
         </>
       )}
     </Box>
