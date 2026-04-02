@@ -63,7 +63,7 @@ export default function VideoInfoRow({
 
   return (
     <Box
-      sx={{ pt: compact ? 0.5 : 1.5, px: 1.5, pb: compact ? 0.5 : 1.5, flex: compact ? 1 : undefined, minWidth: 0 }}
+      sx={{ pt: compact ? 0.5 : 1.5, pl: 1.5, pr: compact ? { xs: 0.5, sm: 1.5 } : 1.5, pb: compact ? 0.5 : 1.5, flex: compact ? 1 : undefined, minWidth: 0 }}
       onClick={isEditing ? (e) => e.stopPropagation() : undefined}
     >
       {isEditing ? (
@@ -120,11 +120,11 @@ export default function VideoInfoRow({
 
             <Box
               sx={{
-                ml: 0.5,
+                ml: compact ? { xs: 0, sm: 0.5 } : 0.5,
                 flexShrink: 0,
-                opacity: hovered ? 1 : 0,
+                opacity: { xs: 1, sm: hovered ? 1 : 0 },
                 transition: "opacity 0.2s",
-                pointerEvents: hovered ? "auto" : "none",
+                pointerEvents: { xs: "auto", sm: hovered ? "auto" : "none" },
               }}
             >
               <Tooltip title="More options">
