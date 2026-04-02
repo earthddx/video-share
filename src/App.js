@@ -78,6 +78,21 @@ function AppInner() {
 
   const hasMiniPlayer = !!state.video.id;
 
+  // Scroll the active video card into view on video change (autoplay, keyboard, miniplayer next/prev)
+  const isFirstVideoRef = useRef(true);
+  useEffect(() => {
+    if (!state.video.id) return;
+    if (isFirstVideoRef.current) { isFirstVideoRef.current = false; return; }
+    const el = document.querySelector(`[data-video-id="${state.video.id}"]`);
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      const headerHeight = 64 + 16; // header + padding
+      if (rect.top < headerHeight || rect.bottom > window.innerHeight) {
+        window.scrollTo({ top: window.scrollY + rect.top - headerHeight, behavior: "smooth" });
+      }
+    }
+  }, [state.video.id]);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
