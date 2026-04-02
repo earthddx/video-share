@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Box, CardMedia, IconButton, Tooltip } from "@mui/material";
 import { Close, Fullscreen, Pause, PlayArrow } from "@mui/icons-material";
 import ReactPlayer from "react-player";
@@ -27,6 +27,7 @@ export default function ActivePlayer({
   // We keep pointer events enabled on the iframe until the video actually starts playing,
   // so the user can tap YouTube's native play button if autoplay was blocked.
   const [hasStarted, setHasStarted] = useState(false);
+  const ignorePauseRef = useRef(false);
   useEffect(() => {
     setHasStarted(false);
   }, [video.url]);
@@ -51,10 +52,14 @@ export default function ActivePlayer({
       }
     },
     onPlay: () => {
+      // When muted flips to false after hasStarted, YouTube fires onPause then onPlay.
+      // Flag the upcoming spurious onPause so we don't reset isPlaying.
+      ignorePauseRef.current = true;
       setHasStarted(true);
       if (!controlsProps.isPlaying) dispatch({ type: "PLAY_VIDEO" });
     },
     onPause: () => {
+      if (ignorePauseRef.current) { ignorePauseRef.current = false; return; }
       if (controlsProps.isPlaying) dispatch({ type: "PAUSE_VIDEO" });
     },
     onEnded: onVideoEnd,
