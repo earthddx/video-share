@@ -21,6 +21,7 @@ export function usePlayback({ isCurrentVideo, state, dispatch, video, queue, pos
     if (nextInQueue) {
       setPlayed(0);
       dispatch({ type: "SET_VIDEO", payload: { video: nextInQueue } });
+      dispatch({ type: "PLAY_VIDEO" });
       return;
     }
     if (allVideos?.length) {
@@ -29,13 +30,14 @@ export function usePlayback({ isCurrentVideo, state, dispatch, video, queue, pos
       if (nextInList && nextInList.id !== video.id) {
         setPlayed(0);
         dispatch({ type: "SET_VIDEO", payload: { video: nextInList } });
+        dispatch({ type: "PLAY_VIDEO" });
       }
     }
   }, [isCurrentVideo, repeatVideo, queue, positionInQueue, allVideos, video.id, dispatch]);
 
   // Fallback for YouTube (which sometimes suppresses onEnded)
   useEffect(() => {
-    if (played >= 0.99) handleVideoEnd();
+    if (played >= 0.999) handleVideoEnd();
   }, [played, handleVideoEnd]);
 
   // Lock orientation to landscape on mobile when expanded
