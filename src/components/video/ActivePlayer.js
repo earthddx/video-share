@@ -40,6 +40,12 @@ export default function ActivePlayer({
         hasRestoredSeek.current = true;
       }
     },
+    onPlay: () => {
+      if (!controlsProps.isPlaying) dispatch({ type: "PLAY_VIDEO" });
+    },
+    onPause: () => {
+      if (controlsProps.isPlaying) dispatch({ type: "PAUSE_VIDEO" });
+    },
     onEnded: onVideoEnd,
     onProgress,
   };
