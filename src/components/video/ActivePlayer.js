@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Box, CardMedia, IconButton, Tooltip } from "@mui/material";
 import { Close, Fullscreen, Pause, PlayArrow } from "@mui/icons-material";
 import ReactPlayer from "react-player";
@@ -22,6 +23,14 @@ export default function ActivePlayer({
   dispatch,
   listMode = false,
 }) {
+  // On mobile, YouTube blocks playVideo() from JS unless the user tapped the iframe directly.
+  // We keep pointer events enabled on the iframe until the video actually starts playing,
+  // so the user can tap YouTube's native play button if autoplay was blocked.
+  const [hasStarted, setHasStarted] = useState(false);
+  useEffect(() => {
+    setHasStarted(false);
+  }, [video.url]);
+
   const sharedPlayerProps = {
     ref: reactPlayerRef,
     url: video.url,
@@ -32,7 +41,7 @@ export default function ActivePlayer({
     playsinline: true,
     width: "100%",
     height: "100%",
-    style: { pointerEvents: "none" },
+    style: { pointerEvents: hasStarted ? "none" : "auto" },
     config: { youtube: { playerVars: { playsinline: 1 } } },
     onReady: () => {
       if (!hasRestoredSeek.current) {
@@ -41,6 +50,7 @@ export default function ActivePlayer({
       }
     },
     onPlay: () => {
+      setHasStarted(true);
       if (!controlsProps.isPlaying) dispatch({ type: "PLAY_VIDEO" });
     },
     onPause: () => {
@@ -58,7 +68,12 @@ export default function ActivePlayer({
       {isVideoExpanded && (
         <Box
           onClick={() => dispatch({ type: "COLLAPSE_VIDEO" })}
-          sx={{ position: "fixed", inset: 0, bgcolor: "rgba(0,0,0,0.85)", zIndex: 1300 }}
+          sx={{
+            position: "fixed",
+            inset: 0,
+            bgcolor: "rgba(0,0,0,0.85)",
+            zIndex: 1300,
+          }}
         />
       )}
 
@@ -80,10 +95,25 @@ export default function ActivePlayer({
         }
       >
         {/* ReactPlayer always mounted — preserves position across mode changes */}
-        <Box sx={audioOnly ? { position: "absolute", inset: 0, opacity: 0, pointerEvents: "none" } : { width: "100%", height: "100%" }}>
+        <Box
+          sx={
+            audioOnly
+              ? {
+                  position: "absolute",
+                  inset: 0,
+                  opacity: 0,
+                  pointerEvents: "none",
+                }
+              : { width: "100%", height: "100%" }
+          }
+        >
           <ReactPlayer
             {...sharedPlayerProps}
-            height={isVideoExpanded ? `calc(100% - ${MODAL_CONTROLS_HEIGHT}px)` : "100%"}
+            height={
+              isVideoExpanded
+                ? `calc(100% - ${MODAL_CONTROLS_HEIGHT}px)`
+                : "100%"
+            }
           />
         </Box>
 
@@ -92,7 +122,13 @@ export default function ActivePlayer({
           <CardMedia
             component="img"
             src={video.thumbnail}
-            sx={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+            sx={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
           />
         )}
 
@@ -100,7 +136,17 @@ export default function ActivePlayer({
         {isVideoExpanded && (
           <Box
             onClick={(e) => e.stopPropagation()}
-            sx={{ position: "absolute", top: 0, left: 0, right: 0, display: "flex", justifyContent: "flex-end", px: 1, pt: 1, zIndex: 1 }}
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              display: "flex",
+              justifyContent: "flex-end",
+              px: 1,
+              pt: 1,
+              zIndex: 1,
+            }}
           >
             <Tooltip title="Close">
               <IconButton onClick={() => dispatch({ type: "COLLAPSE_VIDEO" })}>
@@ -114,7 +160,17 @@ export default function ActivePlayer({
         {isVideoExpanded && (
           <Box
             onClick={(e) => e.stopPropagation()}
-            sx={{ position: "absolute", bottom: 0, left: 0, right: 0, px: 2, pb: 1, pt: 3, background: "linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%)" }}
+            sx={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              px: 2,
+              pb: 1,
+              pt: 3,
+              background:
+                "linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%)",
+            }}
           >
             <PlayerControls {...controlsProps} />
           </Box>
@@ -126,14 +182,24 @@ export default function ActivePlayer({
         <Box
           sx={{
             position: "absolute",
-            bottom: 0, left: 0, right: 0,
-            background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)",
-            px: 1, pb: 0.5, pt: 4,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            background:
+              "linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)",
+            px: 1,
+            pb: 0.5,
+            pt: 4,
             opacity: showControls ? 1 : 0,
             transition: "opacity 0.2s",
           }}
         >
-          <PlayerControls compact showExpand onExpand={() => dispatch({ type: "EXPAND_VIDEO" })} {...controlsProps} />
+          <PlayerControls
+            compact
+            showExpand
+            onExpand={() => dispatch({ type: "EXPAND_VIDEO" })}
+            {...controlsProps}
+          />
         </Box>
       )}
 
@@ -143,25 +209,43 @@ export default function ActivePlayer({
           <Box
             onClick={onTogglePlay}
             sx={{
-              position: "absolute", inset: 0,
-              display: "flex", alignItems: "center", justifyContent: "center",
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
               opacity: showControls ? 1 : 0,
               transition: "opacity 0.2s",
               cursor: "pointer",
             }}
           >
-            <IconButton sx={{ bgcolor: "rgba(0,0,0,0.6)", "&:hover": { bgcolor: "rgba(0,0,0,0.85)" }, width: 40, height: 40, pointerEvents: "none" }}>
-              {controlsProps.isPlaying
-                ? <Pause sx={{ color: "white", fontSize: 22 }} />
-                : <PlayArrow sx={{ color: "white", fontSize: 22 }} />}
+            <IconButton
+              sx={{
+                bgcolor: "rgba(0,0,0,0.6)",
+                "&:hover": { bgcolor: "rgba(0,0,0,0.85)" },
+                width: 40,
+                height: 40,
+                pointerEvents: "none",
+              }}
+            >
+              {controlsProps.isPlaying ? (
+                <Pause sx={{ color: "white", fontSize: 22 }} />
+              ) : (
+                <PlayArrow sx={{ color: "white", fontSize: 22 }} />
+              )}
             </IconButton>
           </Box>
 
           <IconButton
-            onClick={(e) => { e.stopPropagation(); dispatch({ type: "EXPAND_VIDEO" }); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              dispatch({ type: "EXPAND_VIDEO" });
+            }}
             size="small"
             sx={{
-              position: "absolute", bottom: 4, right: 4,
+              position: "absolute",
+              bottom: 4,
+              right: 4,
               opacity: showControls ? 1 : 0,
               transition: "opacity 0.2s",
               bgcolor: "rgba(0,0,0,0.5)",
