@@ -1,6 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 
-export function usePlayback({ isCurrentVideo, state, dispatch, video, queue, positionInQueue, allVideos }) {
+export function usePlayback({
+  isCurrentVideo,
+  state,
+  dispatch,
+  video,
+  queue,
+  positionInQueue,
+  allVideos,
+}) {
   const [played, setPlayed] = useState(0);
   const [playedSeconds, setPlayedSeconds] = useState(0);
   const [isUserSeeking, setIsUserSeeking] = useState(false);
@@ -12,12 +20,15 @@ export function usePlayback({ isCurrentVideo, state, dispatch, video, queue, pos
   const lastDispatchedSecondsRef = useRef(0);
   const hasAdvancedRef = useRef(false);
 
-  useEffect(() => { hasAdvancedRef.current = false; }, [video.id]);
+  useEffect(() => {
+    if (isCurrentVideo) hasAdvancedRef.current = false;
+  }, [isCurrentVideo]);
 
   const handleVideoEnd = useCallback(() => {
     if (!isCurrentVideo || repeatVideo || hasAdvancedRef.current) return;
     hasAdvancedRef.current = true;
-    const nextInQueue = positionInQueue >= 0 ? queue[positionInQueue + 1] : undefined;
+    const nextInQueue =
+      positionInQueue >= 0 ? queue[positionInQueue + 1] : undefined;
     if (nextInQueue) {
       setPlayed(0);
       dispatch({ type: "SET_VIDEO", payload: { video: nextInQueue } });
@@ -33,7 +44,15 @@ export function usePlayback({ isCurrentVideo, state, dispatch, video, queue, pos
         dispatch({ type: "PLAY_VIDEO" });
       }
     }
-  }, [isCurrentVideo, repeatVideo, queue, positionInQueue, allVideos, video.id, dispatch]);
+  }, [
+    isCurrentVideo,
+    repeatVideo,
+    queue,
+    positionInQueue,
+    allVideos,
+    video.id,
+    dispatch,
+  ]);
 
   // Fallback for YouTube (which sometimes suppresses onEnded)
   useEffect(() => {
@@ -60,10 +79,14 @@ export function usePlayback({ isCurrentVideo, state, dispatch, video, queue, pos
   }, [state.seekTo, isCurrentVideo, dispatch]);
 
   return {
-    played, setPlayed,
-    playedSeconds, setPlayedSeconds,
-    isUserSeeking, setIsUserSeeking,
-    repeatVideo, setRepeatVideo,
+    played,
+    setPlayed,
+    playedSeconds,
+    setPlayedSeconds,
+    isUserSeeking,
+    setIsUserSeeking,
+    repeatVideo,
+    setRepeatVideo,
     reactPlayerRef,
     initialSecondsRef,
     hasRestoredSeek,

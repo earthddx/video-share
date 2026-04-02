@@ -35,7 +35,7 @@ export default function ActivePlayer({
     style: { pointerEvents: "none" },
     config: { youtube: { playerVars: { playsinline: 1 } } },
     onReady: () => {
-      if (!hasRestoredSeek.current && initialSecondsRef.current > 0) {
+      if (!hasRestoredSeek.current) {
         reactPlayerRef.current?.seekTo(initialSecondsRef.current, "seconds");
         hasRestoredSeek.current = true;
       }
